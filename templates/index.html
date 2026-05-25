@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Json-SB – Editor Titolare Effettivo</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root { --brand: #0a3d62; --brand-light: #1a5276; }
+body { background: #f0f2f5; font-size: .9rem; }
+
+/* Upload */
+.upload-zone {
+  border: 2.5px dashed #ced4da;
+  border-radius: 16px;
+  padding: 60px 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s;
+  background: #fff;
+}
+.upload-zone.dragover,
+.upload-zone:hover { border-color: var(--brand); background: #eaf1fb; }
+
+/* Navbar */
+.main-navbar { background: var(--brand) !important; }
+
+/* Cards */
+.section-card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.section-card .card-header {
+  background: #fff;
+  border-bottom: 2px solid #f0f2f5;
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+/* Chain table */
+.chain-table td { vertical-align: middle; }
+.chain-table .link-row { background: #fff; }
+.titolari-block {
+  background: #fffcf0;
+  border-left: 3px solid #ffc107;
+  padding: 8px 12px 6px;
+  border-radius: 0 8px 8px 0;
+  margin: 0 0 2px 20px;
+}
+
+/* Modals */
+.modal-header { background: var(--brand); color: #fff; }
+.btn-close-white { filter: invert(1); }
+
+/* Badges */
+.badge-lv { font-size: .75rem; min-width: 26px; }
+
+/* Misc */
+code { font-size: .78rem; }
+.field-label { font-size: .75rem; color: #6c757d; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ UPLOAD SCREEN ══════════════ -->
+<div id="uploadScreen" class="min-vh-100 d-flex align-items-center justify-content-center p-3">
+  <div style="width:100%;max-width:520px">
+    <div class="text-center mb-4">
+      <i class="bi bi-diagram-3" style="font-size:3.2rem;color:var(--brand)"></i>
+      <h1 class="fw-bold mt-2 mb-0" style="color:var(--brand)">Json-SB</h1>
+      <p class="text-muted">Editor Titolare Effettivo</p>
+    </div>
+    <div class="card section-card">
+      <div class="card-body p-4">
+        <div class="upload-zone" id="uploadZone">
+          <i class="bi bi-cloud-upload" style="font-size:2.8rem;color:#adb5bd"></i>
+          <h5 class="mt-3 mb-1">Carica il file JSON</h5>
+          <p class="text-muted small mb-3">Trascina qui il file o clicca per selezionarlo</p>
+          <button class="btn btn-primary px-4" onclick="document.getElementById('fileInput').click()">
+            <i class="bi bi-folder2-open me-2"></i>Seleziona file
+          </button>
+          <input type="file" id="fileInput" accept=".json,application/json" class="d-none">
+        </div>
+        <div id="uploadError" class="alert alert-danger mt-3 d-none small mb-0"></div>
+      </div>
+    </div>
+    <p class="text-center text-muted small mt-3">
+      Formati supportati: JSON (catena titolari effettivi SolutionBank)
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════ EDITOR SCREEN ══════════════ -->
+<div id="editorScreen" class="d-none">
+
+  <!-- Navbar -->
+  <nav class="navbar main-navbar sticky-top shadow-sm py-2">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center gap-2 overflow-hidden">
+        <i class="bi bi-diagram-3 text-white fs-5 flex-shrink-0"></i>
+        <span class="fw-bold text-white text-truncate" id="navCompanyName" style="font-size:1rem"></span>
+        <span class="badge bg-light text-dark flex-shrink-0 d-none d-md-inline" id="navPiva"></span>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <small class="text-white-50 d-none d-lg-block" id="navDate"></small>
+        <button class="btn btn-outline-light btn-sm" onclick="showUpload()">
+          <i class="bi bi-folder2-open me-1"></i><span class="d-none d-sm-inline">Nuovo</span>
+        </button>
+        <button class="btn btn-warning btn-sm fw-bold" onclick="downloadJSON()">
+          <i class="bi bi-download me-1"></i>Scarica JSON
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-3 px-3 px-md-4" style="max-width:1440px">
+
+    <!-- ── Azienda Indagata ── -->
+    <div class="card section-card mb-3">
+      <div class="card-header d-flex align-items-center gap-2 py-2"
+           data-bs-toggle="collapse" data-bs-target="#collapseAnagrafica" role="button">
+        <i class="bi bi-building text-primary"></i>
+        <span>Azienda Indagata</span>
+        <i class="bi bi-chevron-down ms-auto text-muted small"></i>
+      </div>
+      <div class="collapse show" id="collapseAnagrafica">
+        <div class="card-body py-3" id="anagraficaSoggettoContent"></div>
+      </div>
+    </div>
+
+    <!-- ── Catena Partecipativa ── -->
+    <div class="card section-card mb-3">
+      <div class="card-header d-flex align-items-center gap-2 py-2">
+        <i class="bi bi-diagram-3 text-primary"></i>
+        <span>Catena Partecipativa</span>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <span class="text-muted small fw-normal">Strategia:</span>
+          <select id="strategiaCalcolo" class="form-select form-select-sm py-0"
+                  style="width:auto;min-width:170px" onchange="updateStrategia(this.value)">
+            <option value="Q">Q – Quantitativo</option>
+            <option value="D">D – Diretto</option>
+            <option value="I">I – Indiretto</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body pb-2" id="catenaContent"></div>
+    </div>
+
+    <!-- ── Anagrafiche ── -->
+    <div class="card section-card mb-4">
+      <div class="card-header d-flex align-items-center gap-2 py-2">
+        <i class="bi bi-people text-primary"></i>
+        <span>Anagrafiche Aziende Collegate</span>
+        <button class="btn btn-primary btn-sm ms-auto" onclick="openAnagraficaModal(-1)">
+          <i class="bi bi-plus-lg me-1"></i>Aggiungi
+        </button>
+      </div>
+      <div class="card-body p-0" id="anagraficheContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: LEGAME ══════════════ -->
+<div class="modal fade" id="legameModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="legameModalTitle">Legame</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Da (From PK) <span class="text-danger">*</span></label>
+            <input type="text" id="lFromPk" class="form-control" list="pkList"
+                   placeholder="PIVA/CF azienda cedente">
+            <div class="form-text">Identificativo dell'azienda di partenza</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">A (To PK) <span class="text-danger">*</span></label>
+            <input type="text" id="lToPk" class="form-control" list="pkList"
+                   placeholder="PIVA/CF azienda ricevente">
+            <div class="form-text">Identificativo dell'azienda destinataria</div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Quote % <span class="text-danger">*</span></label>
+            <input type="number" id="lShares" class="form-control" min="0" max="100"
+                   step="0.01" placeholder="es. 93.75">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Tipo Legame <span class="text-danger">*</span></label>
+            <select id="lTipoLegame" class="form-select">
+              <option value="P">P – Partecipazione</option>
+              <option value="C">C – Controllo</option>
+              <option value="A">A – Amministratore</option>
+              <option value="L">L – Legale Rappresentante</option>
+              <option value="X">X – Altro</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Livello <span class="text-danger">*</span></label>
+            <input type="number" id="lLivello" class="form-control" min="1" placeholder="es. 1">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Etichetta Grafo <span class="text-danger">*</span></label>
+            <input type="text" id="lEtichetta" class="form-control" placeholder="es. 1.1">
+          </div>
+        </div>
+        <div class="alert alert-info mt-3 small mb-0">
+          <i class="bi bi-info-circle me-1"></i>
+          Se l'azienda non è ancora in <strong>Anagrafiche</strong>, aggiungila prima dalla sezione apposita.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-primary" onclick="saveLegame()">
+          <i class="bi bi-check-lg me-1"></i>Salva Legame
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: TITOLARE EFFETTIVO ══════════════ -->
+<div class="modal fade" id="titolareModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="titolareModalTitle">Titolare Effettivo</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <!-- Identificativi -->
+          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0">Identificazione</h6></div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">PK (Codice Fiscale) <span class="text-danger">*</span></label>
+            <input type="text" id="tPk" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. MGGDRD92M10L219E" oninput="this.value=this.value.toUpperCase();document.getElementById('tCF').value=this.value">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Codice Fiscale <span class="text-danger">*</span></label>
+            <input type="text" id="tCF" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. MGGDRD92M10L219E">
+            <div class="form-text">Di solito uguale al PK</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Denominazione (Cognome Nome) <span class="text-danger">*</span></label>
+            <input type="text" id="tDenominazione" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. MAGGIORI EDOARDO">
+          </div>
+
+          <!-- Dati anagrafici -->
+          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Dati Anagrafici</h6></div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Sesso</label>
+            <select id="tSesso" class="form-select">
+              <option value="MALE">Maschile</option>
+              <option value="FEMALE">Femminile</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Data di Nascita</label>
+            <input type="date" id="tDataNascita" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Stato di Nascita</label>
+            <input type="text" id="tStatoNascita" class="form-control" style="text-transform:uppercase"
+                   placeholder="ITALIA">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Luogo di Nascita</label>
+            <input type="text" id="tLuogoNascita" class="form-control" style="text-transform:uppercase"
+                   placeholder="TORINO">
+          </div>
+
+          <!-- Quote -->
+          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Quote &amp; Tipologia</h6></div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Tipologia Quantitativo</label>
+            <select id="tTipologiaQ" class="form-select">
+              <option value="Quantitativo diretto">Quantitativo diretto</option>
+              <option value="Quantitativo indiretto">Quantitativo indiretto</option>
+              <option value="Qualitativo">Qualitativo</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Role % <span class="text-danger">*</span></label>
+            <input type="number" id="tRole" class="form-control" min="0" max="100" step="0.01"
+                   placeholder="es. 93.75">
+            <div class="form-text">Quota di partecipazione diretta</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Quota Catena %</label>
+            <input type="number" id="tQuotaCatena" class="form-control" min="0" max="100" step="0.01"
+                   placeholder="es. 64.72">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Totale Quota Cumulativa %</label>
+            <input type="number" id="tTotaleQuota" class="form-control" min="0" max="100" step="0.01"
+                   placeholder="es. 93.75">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-primary" onclick="saveTitolare()">
+          <i class="bi bi-check-lg me-1"></i>Salva Titolare
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: ANAGRAFICA ══════════════ -->
+<div class="modal fade" id="anagraficaModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="anagraficaModalTitle">Anagrafica</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-semibold">PK / PIVA <span class="text-danger">*</span></label>
+            <input type="text" id="aPk" class="form-control" placeholder="es. 10222650961">
+            <div class="form-text">Identificativo univoco (PIVA o Codice Fiscale)</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Ragione Sociale <span class="text-danger">*</span></label>
+            <input type="text" id="aRagioneSociale" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. SUN TZU S.R.L.">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">PIVA</label>
+            <input type="text" id="aPiva" class="form-control" placeholder="es. 10222650961">
+            <div class="form-text">Se diversa dal PK, altrimenti lasciare vuoto</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Indirizzo</label>
+            <input type="text" id="aIndirizzo" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. VIA ROMA 1, 20100 MILANO, MI">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-primary" onclick="saveAnagrafica()">
+          <i class="bi bi-check-lg me-1"></i>Salva Anagrafica
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Datalist PKs -->
+<datalist id="pkList"></datalist>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+  <div id="toastMsg" class="toast align-items-center text-bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body fw-semibold" id="toastBody"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+const state = {
+  jsonData: null,
+  filename: '',
+  editLegame: { pIdx: null, lIdx: null },
+  editTitolare: { pIdx: null, lIdx: null, tIdx: null },
+  editAnagrafica: null
+};
+
+let modLegame, modTitolare, modAnagrafica;
+
+// ═══════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  modLegame     = new bootstrap.Modal('#legameModal');
+  modTitolare   = new bootstrap.Modal('#titolareModal');
+  modAnagrafica = new bootstrap.Modal('#anagraficaModal');
+
+  document.getElementById('fileInput').addEventListener('change', e => {
+    if (e.target.files[0]) loadFile(e.target.files[0]);
+  });
+
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', ()  => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+  zone.addEventListener('click', e => {
+    if (e.target.tagName !== 'BUTTON') document.getElementById('fileInput').click();
+  });
+});
+
+// ═══════════════════════════════════════════════════
+//  FILE HANDLING
+// ═══════════════════════════════════════════════════
+function loadFile(file) {
+  state.filename = file.name.replace(/\.json$/i, '');
+  const reader = new FileReader();
+  reader.onload = e => {
+    let data;
+    try { data = JSON.parse(e.target.result); }
+    catch (err) { showUploadError('File JSON non valido: ' + err.message); return; }
+
+    const errors = validateJSON(data);
+    if (errors.length) {
+      showUploadError('Formato non compatibile:\n• ' + errors.join('\n• '));
+      return;
+    }
+    state.jsonData = data;
+    document.getElementById('uploadScreen').classList.add('d-none');
+    document.getElementById('editorScreen').classList.remove('d-none');
+    document.getElementById('uploadError').classList.add('d-none');
+    renderAll();
+  };
+  reader.readAsText(file);
+}
+
+function validateJSON(d) {
+  const e = [];
+  if (!d || typeof d !== 'object') { e.push('Non è un oggetto JSON'); return e; }
+  if (!Array.isArray(d.risposte) || !d.risposte.length) { e.push('"risposte" mancante o vuoto'); return e; }
+  const r = d.risposte[0];
+  if (!r.dt_evasione)                              e.push('"dt_evasione" mancante');
+  if (!r.anagrafica_soggetto?.pk)                  e.push('"anagrafica_soggetto.pk" mancante');
+  if (!r.anagrafica_soggetto?.denominazione)       e.push('"anagrafica_soggetto.denominazione" mancante');
+  if (!r.catena)                                   { e.push('"catena" mancante'); return e; }
+  if (!r.catena.strategia_calcolo)                 e.push('"catena.strategia_calcolo" mancante');
+  if (!Array.isArray(r.catena.percorsi))           e.push('"catena.percorsi" non è un array');
+  else r.catena.percorsi.forEach((p, i) => {
+    if (!Array.isArray(p.percorso)) e.push(`"catena.percorsi[${i}].percorso" non è un array`);
+  });
+  if (!Array.isArray(r.anagrafiche))               e.push('"anagrafiche" non è un array');
+  return e;
+}
+
+function showUploadError(msg) {
+  const el = document.getElementById('uploadError');
+  el.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>' +
+                 esc(msg).replace(/\n/g, '<br>');
+  el.classList.remove('d-none');
+}
+
+function showUpload() {
+  document.getElementById('editorScreen').classList.add('d-none');
+  document.getElementById('uploadScreen').classList.remove('d-none');
+  document.getElementById('fileInput').value = '';
+}
+
+// ═══════════════════════════════════════════════════
+//  DOWNLOAD
+// ═══════════════════════════════════════════════════
+function downloadJSON() {
+  const blob = new Blob([JSON.stringify(state.jsonData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = state.filename + '_NEW.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Scaricato: ' + state.filename + '_NEW.json');
+}
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+const R = () => state.jsonData.risposte[0];
+
+function companyName(pk) {
+  const r = R();
+  if (pk === r.anagrafica_soggetto.pk) return r.anagrafica_soggetto.denominazione;
+  const a = r.anagrafiche.find(x => x.pk === pk);
+  return a ? (a.ragione_sociale || pk) : pk;
+}
+
+function refreshPkList() {
+  const r = R();
+  const pks = new Set([r.anagrafica_soggetto.pk]);
+  r.anagrafiche.forEach(a => pks.add(a.pk));
+  document.getElementById('pkList').innerHTML =
+    [...pks].map(pk => `<option value="${esc(pk)}">${esc(companyName(pk))}</option>`).join('');
+}
+
+function isoToDate(iso) {
+  if (!iso) return '';
+  try { return iso.substring(0, 10); } catch { return ''; }
+}
+
+function dateToISO(s) {
+  if (!s) return '';
+  try { return new Date(s + 'T00:00:00Z').toISOString(); } catch { return ''; }
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleDateString('it-IT'); } catch { return iso; }
+}
+
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toastMsg');
+  el.className = `toast align-items-center text-bg-${type} border-0`;
+  document.getElementById('toastBody').textContent = msg;
+  bootstrap.Toast.getOrCreateInstance(el, { delay: 3000 }).show();
+}
+
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════
+function renderAll() {
+  const r = R();
+  document.getElementById('navCompanyName').textContent = r.anagrafica_soggetto.denominazione;
+  document.getElementById('navPiva').textContent = 'PIVA: ' + r.anagrafica_soggetto.piva;
+  document.getElementById('navDate').textContent = 'Data evasione: ' + fmtDate(r.dt_evasione);
+  renderAnagraficaSoggetto();
+  renderCatena();
+  renderAnagrafiche();
+  refreshPkList();
+}
+
+// ── Azienda Indagata ──────────────────────────────
+function renderAnagraficaSoggetto() {
+  const a = R().anagrafica_soggetto;
+  const fields = [
+    ['PK / PIVA', a.pk], ['Codice Fiscale', a.codiceFiscale],
+    ['Denominazione', a.denominazione], ['Indirizzo', a.indirizzo],
+    ['Città', a.citta], ['Stato', a.stato],
+    ['CCIAA', a.cciaa], ['N. REA', a.nrea],
+    ['Stato Attività', a.statoAttivita], ['ATECO', a.ateco],
+    ['SAE', a.sae], ['RAE', a.rae],
+    ['Data Iscrizione', a.dataIscrizione]
+  ].filter(([, v]) => v != null && v !== '');
+
+  document.getElementById('anagraficaSoggettoContent').innerHTML =
+    '<div class="row row-cols-auto g-3">' +
+    fields.map(([k, v]) =>
+      `<div class="col"><div class="field-label">${esc(k)}</div><strong>${esc(v)}</strong></div>`
+    ).join('') + '</div>';
+}
+
+// ── Catena ────────────────────────────────────────
+function renderCatena() {
+  const catena = R().catena;
+  let html = '';
+
+  catena.percorsi.forEach((percorsoObj, pIdx) => {
+    const links = percorsoObj.percorso;
+
+    if (catena.percorsi.length > 1) {
+      html += `<div class="d-flex align-items-center mb-2 mt-${pIdx > 0 ? 3 : 0}">
+        <i class="bi bi-share text-muted me-2"></i>
+        <h6 class="mb-0 text-muted">Percorso ${pIdx + 1}</h6>
+        <button class="btn btn-outline-danger btn-sm py-0 ms-auto"
+                onclick="confirmDeletePercorso(${pIdx})" title="Elimina percorso">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>`;
+    }
+
+    html += `<div class="table-responsive mb-1">
+      <table class="table chain-table table-hover mb-0 small">
+        <thead class="table-light text-muted" style="font-size:.78rem">
+          <tr>
+            <th style="width:40px">Lv.</th>
+            <th>Da Società</th>
+            <th style="width:24px" class="text-center"></th>
+            <th>A Società</th>
+            <th style="width:80px">Quote</th>
+            <th style="width:60px">Tipo</th>
+            <th style="width:90px">Etichetta</th>
+            <th style="width:90px" class="text-end">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    links.forEach((l, lIdx) => {
+      const fromName = companyName(l.anagrafica_fornitore_from_pk);
+      const toName   = companyName(l.anagrafica_fornitore_to_pk);
+      const hasTit   = l.titolari_effettivi && l.titolari_effettivi.length > 0;
+
+      html += `<tr class="link-row">
+        <td><span class="badge bg-secondary badge-lv">${esc(l.livello)}</span></td>
+        <td>
+          <div class="fw-semibold">${esc(fromName)}</div>
+          <div class="text-muted" style="font-size:.72rem">${esc(l.anagrafica_fornitore_from_pk)}</div>
+        </td>
+        <td class="text-center text-muted px-0"><i class="bi bi-arrow-right"></i></td>
+        <td>
+          <div class="fw-semibold">${esc(toName)}</div>
+          <div class="text-muted" style="font-size:.72rem">${esc(l.anagrafica_fornitore_to_pk)}</div>
+        </td>
+        <td><span class="badge bg-primary">${esc(l.shares)}%</span></td>
+        <td><span class="badge bg-info text-dark">${esc(l.tipo_legame)}</span></td>
+        <td><code>${esc(l.etichetta_grafo || '')}</code></td>
+        <td class="text-end">
+          <button class="btn btn-outline-primary btn-sm py-0 px-1 me-1"
+                  onclick="openLegameModal(${pIdx},${lIdx})" title="Modifica legame">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm py-0 px-1"
+                  onclick="confirmDeleteLegame(${pIdx},${lIdx})" title="Elimina legame">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="8" class="pt-0 pb-2" style="border-top:none">
+          <div class="titolari-block">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <i class="bi bi-person-badge small" style="color:#e67e22"></i>
+              <strong style="font-size:.78rem">Titolari Effettivi</strong>
+              <button class="btn btn-outline-success btn-sm py-0 px-2 ms-auto"
+                      style="font-size:.75rem"
+                      onclick="openTitolareModal(${pIdx},${lIdx},-1)">
+                <i class="bi bi-person-plus-fill me-1"></i>Aggiungi
+              </button>
+            </div>`;
+
+      if (hasTit) {
+        l.titolari_effettivi.forEach((t, tIdx) => {
+          html += `<div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+            <i class="bi bi-person-fill text-warning"></i>
+            <span class="fw-semibold">${esc(t.denominazione)}</span>
+            <code style="font-size:.72rem">${esc(t.pk)}</code>
+            <span class="badge bg-warning text-dark">${esc(t.totale_quota_cumulativa)}%</span>
+            <span class="text-muted small">${esc(t.tipologia_quantitativo || '')}</span>
+            <div class="ms-auto d-flex gap-1">
+              <button class="btn btn-outline-primary btn-sm py-0 px-1"
+                      onclick="openTitolareModal(${pIdx},${lIdx},${tIdx})" title="Modifica">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger btn-sm py-0 px-1"
+                      onclick="confirmDeleteTitolare(${pIdx},${lIdx},${tIdx})" title="Elimina">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>`;
+        });
+      } else {
+        html += `<span class="text-muted fst-italic" style="font-size:.78rem">
+                   Nessun titolare effettivo individuato</span>`;
+      }
+
+      html += `</div></td></tr>`;
+    });
+
+    html += `</tbody></table></div>
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary btn-sm" onclick="openLegameModal(${pIdx},-1)">
+          <i class="bi bi-plus-lg me-1"></i>Aggiungi Legame
+        </button>
+      </div>`;
+  });
+
+  // Aggiungi Percorso
+  html += `<div class="border-top pt-2 d-flex justify-content-end">
+    <button class="btn btn-outline-secondary btn-sm" onclick="addPercorso()">
+      <i class="bi bi-diagram-2 me-1"></i>Aggiungi Percorso
+    </button>
+  </div>`;
+
+  document.getElementById('catenaContent').innerHTML = html;
+  document.getElementById('strategiaCalcolo').value = R().catena.strategia_calcolo;
+}
+
+// ── Anagrafiche ───────────────────────────────────
+function renderAnagrafiche() {
+  const list = R().anagrafiche;
+  if (!list.length) {
+    document.getElementById('anagraficheContent').innerHTML =
+      '<p class="text-muted text-center py-4 mb-0"><i class="bi bi-inbox me-2"></i>Nessuna anagrafica presente</p>';
+    return;
+  }
+  let html = `<div class="table-responsive">
+    <table class="table table-hover small mb-0">
+      <thead class="table-light text-muted" style="font-size:.78rem">
+        <tr>
+          <th>PK / PIVA</th>
+          <th>Ragione Sociale</th>
+          <th class="d-none d-md-table-cell">PIVA</th>
+          <th class="d-none d-lg-table-cell">Indirizzo</th>
+          <th style="width:90px" class="text-end">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>`;
+  list.forEach((a, idx) => {
+    html += `<tr>
+      <td><code>${esc(a.pk)}</code></td>
+      <td class="fw-semibold">${esc(a.ragione_sociale || '')}</td>
+      <td class="text-muted d-none d-md-table-cell">${esc(a.piva || '')}</td>
+      <td class="text-muted d-none d-lg-table-cell small">${esc(a.indirizzo || '')}</td>
+      <td class="text-end">
+        <button class="btn btn-outline-primary btn-sm py-0 px-1 me-1"
+                onclick="openAnagraficaModal(${idx})" title="Modifica">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-outline-danger btn-sm py-0 px-1"
+                onclick="confirmDeleteAnagrafica(${idx})" title="Elimina">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('anagraficheContent').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  STRATEGIA
+// ═══════════════════════════════════════════════════
+function updateStrategia(val) {
+  R().catena.strategia_calcolo = val;
+  toast('Strategia aggiornata: ' + val);
+}
+
+// ═══════════════════════════════════════════════════
+//  LEGAMI CRUD
+// ═══════════════════════════════════════════════════
+function openLegameModal(pIdx, lIdx) {
+  state.editLegame = { pIdx, lIdx };
+  const isNew = lIdx === -1;
+  document.getElementById('legameModalTitle').textContent =
+    isNew ? 'Aggiungi Legame' : 'Modifica Legame';
+
+  if (!isNew) {
+    const l = R().catena.percorsi[pIdx].percorso[lIdx];
+    document.getElementById('lFromPk').value    = l.anagrafica_fornitore_from_pk;
+    document.getElementById('lToPk').value      = l.anagrafica_fornitore_to_pk;
+    document.getElementById('lShares').value    = l.shares;
+    document.getElementById('lTipoLegame').value = l.tipo_legame;
+    document.getElementById('lLivello').value   = l.livello;
+    document.getElementById('lEtichetta').value = l.etichetta_grafo || '';
+  } else {
+    ['lFromPk','lToPk','lShares','lLivello','lEtichetta'].forEach(id =>
+      document.getElementById(id).value = '');
+    document.getElementById('lTipoLegame').value = 'P';
+  }
+  refreshPkList();
+  modLegame.show();
+}
+
+function saveLegame() {
+  const fromPk   = document.getElementById('lFromPk').value.trim();
+  const toPk     = document.getElementById('lToPk').value.trim();
+  const shares   = document.getElementById('lShares').value.trim();
+  const tipo     = document.getElementById('lTipoLegame').value;
+  const livello  = document.getElementById('lLivello').value.trim();
+  const etich    = document.getElementById('lEtichetta').value.trim();
+
+  if (!fromPk || !toPk || !shares || !livello || !etich) {
+    alert('Compila tutti i campi obbligatori (Da, A, Quote %, Livello, Etichetta Grafo).');
+    return;
+  }
+
+  const { pIdx, lIdx } = state.editLegame;
+  const percorso = R().catena.percorsi[pIdx].percorso;
+
+  const obj = {
+    shares: String(shares),
+    anagrafica_fornitore_from_pk: fromPk,
+    anagrafica_fornitore_to_pk:   toPk,
+    tipo_legame:    tipo,
+    livello:        String(livello),
+    titolari_effettivi: lIdx === -1 ? [] : percorso[lIdx].titolari_effettivi,
+    etichetta_grafo: etich
+  };
+
+  if (lIdx === -1) percorso.push(obj);
+  else            percorso[lIdx] = obj;
+
+  modLegame.hide();
+  renderCatena();
+  refreshPkList();
+  toast(lIdx === -1 ? 'Legame aggiunto' : 'Legame modificato');
+}
+
+function confirmDeleteLegame(pIdx, lIdx) {
+  if (confirm('Eliminare questo legame?\nVerranno eliminati anche i relativi titolari effettivi.'))
+    deleteLegame(pIdx, lIdx);
+}
+function deleteLegame(pIdx, lIdx) {
+  R().catena.percorsi[pIdx].percorso.splice(lIdx, 1);
+  renderCatena();
+  toast('Legame eliminato', 'warning');
+}
+
+// ── Percorso ────────────────────────────────
+function addPercorso() {
+  R().catena.percorsi.push({ percorso: [] });
+  renderCatena();
+  toast('Nuovo percorso aggiunto');
+}
+function confirmDeletePercorso(pIdx) {
+  if (R().catena.percorsi.length <= 1) { alert("Non puoi eliminare l'unico percorso."); return; }
+  if (confirm('Eliminare il percorso ' + (pIdx + 1) + ' con tutti i suoi legami?')) {
+    R().catena.percorsi.splice(pIdx, 1);
+    renderCatena();
+    toast('Percorso eliminato', 'warning');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  TITOLARI EFFETTIVI CRUD
+// ═══════════════════════════════════════════════════
+function openTitolareModal(pIdx, lIdx, tIdx) {
+  state.editTitolare = { pIdx, lIdx, tIdx };
+  const isNew = tIdx === -1;
+  document.getElementById('titolareModalTitle').textContent =
+    isNew ? 'Aggiungi Titolare Effettivo' : 'Modifica Titolare Effettivo';
+
+  if (!isNew) {
+    const t = R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi[tIdx];
+    document.getElementById('tPk').value           = t.pk || '';
+    document.getElementById('tCF').value           = t.codice_fiscale || '';
+    document.getElementById('tDenominazione').value = t.denominazione || '';
+    document.getElementById('tSesso').value        = t.sesso || 'MALE';
+    document.getElementById('tDataNascita').value  = isoToDate(t.data_nascita);
+    document.getElementById('tStatoNascita').value = t.stato_nascita || '';
+    document.getElementById('tLuogoNascita').value = t.luogo_nascita || '';
+    document.getElementById('tTipologiaQ').value   = t.tipologia_quantitativo || 'Quantitativo indiretto';
+    document.getElementById('tRole').value         = t.role || '';
+    document.getElementById('tQuotaCatena').value  = t.quota_catena || '';
+    document.getElementById('tTotaleQuota').value  = t.totale_quota_cumulativa || '';
+  } else {
+    ['tPk','tCF','tDenominazione','tStatoNascita','tLuogoNascita',
+     'tRole','tQuotaCatena','tTotaleQuota','tDataNascita'].forEach(id =>
+      document.getElementById(id).value = '');
+    document.getElementById('tSesso').value      = 'MALE';
+    document.getElementById('tTipologiaQ').value = 'Quantitativo indiretto';
+  }
+  modTitolare.show();
+}
+
+function saveTitolare() {
+  const pk   = document.getElementById('tPk').value.trim().toUpperCase();
+  const den  = document.getElementById('tDenominazione').value.trim().toUpperCase();
+  const role = document.getElementById('tRole').value.trim();
+
+  if (!pk || !den || !role) {
+    alert('Compila i campi obbligatori: PK, Denominazione, Role %.');
+    return;
+  }
+
+  const quotaCatena = document.getElementById('tQuotaCatena').value.trim() || role;
+  const totQuota    = document.getElementById('tTotaleQuota').value.trim() || role;
+
+  const obj = {
+    pk:                      pk,
+    denominazione:            den,
+    codice_fiscale:           document.getElementById('tCF').value.trim().toUpperCase() || pk,
+    stato_nascita:            document.getElementById('tStatoNascita').value.trim().toUpperCase(),
+    luogo_nascita:            document.getElementById('tLuogoNascita').value.trim().toUpperCase(),
+    sesso:                    document.getElementById('tSesso').value,
+    role:                     String(role),
+    tipologia_quantitativo:   document.getElementById('tTipologiaQ').value,
+    quota_catena:             String(quotaCatena),
+    totale_quota_cumulativa:  String(totQuota),
+    data_nascita:             dateToISO(document.getElementById('tDataNascita').value)
+  };
+
+  const { pIdx, lIdx, tIdx } = state.editTitolare;
+  const list = R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi;
+
+  if (tIdx === -1) list.push(obj);
+  else            list[tIdx] = obj;
+
+  modTitolare.hide();
+  renderCatena();
+  toast(tIdx === -1 ? 'Titolare aggiunto' : 'Titolare modificato');
+}
+
+function confirmDeleteTitolare(pIdx, lIdx, tIdx) {
+  if (confirm('Eliminare questo titolare effettivo?'))
+    deleteTitolare(pIdx, lIdx, tIdx);
+}
+function deleteTitolare(pIdx, lIdx, tIdx) {
+  R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi.splice(tIdx, 1);
+  renderCatena();
+  toast('Titolare eliminato', 'warning');
+}
+
+// ═══════════════════════════════════════════════════
+//  ANAGRAFICHE CRUD
+// ═══════════════════════════════════════════════════
+function openAnagraficaModal(idx) {
+  state.editAnagrafica = idx;
+  const isNew = idx === -1;
+  document.getElementById('anagraficaModalTitle').textContent =
+    isNew ? 'Aggiungi Anagrafica' : 'Modifica Anagrafica';
+
+  if (!isNew) {
+    const a = R().anagrafiche[idx];
+    document.getElementById('aPk').value             = a.pk || '';
+    document.getElementById('aRagioneSociale').value = a.ragione_sociale || '';
+    document.getElementById('aPiva').value           = a.piva || '';
+    document.getElementById('aIndirizzo').value      = a.indirizzo || '';
+  } else {
+    ['aPk','aRagioneSociale','aPiva','aIndirizzo'].forEach(id =>
+      document.getElementById(id).value = '');
+  }
+  modAnagrafica.show();
+}
+
+function saveAnagrafica() {
+  const pk  = document.getElementById('aPk').value.trim();
+  const rs  = document.getElementById('aRagioneSociale').value.trim().toUpperCase();
+
+  if (!pk || !rs) {
+    alert('Compila i campi obbligatori: PK e Ragione Sociale.');
+    return;
+  }
+
+  const obj = {
+    pk:             pk,
+    ragione_sociale: rs,
+    piva:           document.getElementById('aPiva').value.trim() || pk,
+    indirizzo:      document.getElementById('aIndirizzo').value.trim().toUpperCase()
+  };
+
+  const idx  = state.editAnagrafica;
+  const list = R().anagrafiche;
+
+  if (idx === -1) {
+    const dup = list.findIndex(a => a.pk === pk);
+    if (dup >= 0) {
+      if (!confirm(`PK "${pk}" già presente. Sovrascrivere?`)) return;
+      list[dup] = obj;
+    } else {
+      list.push(obj);
+    }
+  } else {
+    list[idx] = obj;
+  }
+
+  modAnagrafica.hide();
+  renderAnagrafiche();
+  renderCatena();
+  refreshPkList();
+  toast(idx === -1 ? 'Anagrafica aggiunta' : 'Anagrafica modificata');
+}
+
+function confirmDeleteAnagrafica(idx) {
+  const a = R().anagrafiche[idx];
+  if (confirm(`Eliminare l'anagrafica "${a.ragione_sociale}" (${a.pk})?`))
+    deleteAnagrafica(idx);
+}
+function deleteAnagrafica(idx) {
+  R().anagrafiche.splice(idx, 1);
+  renderAnagrafiche();
+  refreshPkList();
+  toast('Anagrafica eliminata', 'warning');
+}
+</script>
+</body>
+</html>
