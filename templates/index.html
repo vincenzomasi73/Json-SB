@@ -7,10 +7,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-:root { --brand: #0a3d62; --brand-light: #1a5276; }
+:root { --brand: #0a3d62; }
 body { background: #f0f2f5; font-size: .9rem; }
 
-/* Upload */
 .upload-zone {
   border: 2.5px dashed #ced4da;
   border-radius: 16px;
@@ -23,10 +22,8 @@ body { background: #f0f2f5; font-size: .9rem; }
 .upload-zone.dragover,
 .upload-zone:hover { border-color: var(--brand); background: #eaf1fb; }
 
-/* Navbar */
 .main-navbar { background: var(--brand) !important; }
 
-/* Cards */
 .section-card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
 .section-card .card-header {
   background: #fff;
@@ -35,9 +32,10 @@ body { background: #f0f2f5; font-size: .9rem; }
   font-size: .95rem;
 }
 
-/* Chain table */
 .chain-table td { vertical-align: middle; }
 .chain-table .link-row { background: #fff; }
+
+/* Titolari – solo quando strategia Q */
 .titolari-block {
   background: #fffcf0;
   border-left: 3px solid #ffc107;
@@ -46,14 +44,17 @@ body { background: #f0f2f5; font-size: .9rem; }
   margin: 0 0 2px 20px;
 }
 
-/* Modals */
+/* Poteri – solo quando strategia P */
+.poteri-section {
+  background: #f0f4ff;
+  border-left: 3px solid #6610f2;
+  padding: 10px 14px 8px;
+  border-radius: 0 8px 8px 0;
+}
+
 .modal-header { background: var(--brand); color: #fff; }
 .btn-close-white { filter: invert(1); }
-
-/* Badges */
 .badge-lv { font-size: .75rem; min-width: 26px; }
-
-/* Misc */
 code { font-size: .78rem; }
 .field-label { font-size: .75rem; color: #6c757d; }
 </style>
@@ -83,7 +84,7 @@ code { font-size: .78rem; }
       </div>
     </div>
     <p class="text-center text-muted small mt-3">
-      Formati supportati: JSON (catena titolari effettivi SolutionBank)
+      Formati supportati: JSON catena partecipativa SolutionBank (strategia Q e P)
     </p>
   </div>
 </div>
@@ -91,7 +92,6 @@ code { font-size: .78rem; }
 <!-- ══════════════ EDITOR SCREEN ══════════════ -->
 <div id="editorScreen" class="d-none">
 
-  <!-- Navbar -->
   <nav class="navbar main-navbar sticky-top shadow-sm py-2">
     <div class="container-fluid">
       <div class="d-flex align-items-center gap-2 overflow-hidden">
@@ -113,7 +113,7 @@ code { font-size: .78rem; }
 
   <div class="container-fluid py-3 px-3 px-md-4" style="max-width:1440px">
 
-    <!-- ── Azienda Indagata ── -->
+    <!-- Azienda Indagata -->
     <div class="card section-card mb-3">
       <div class="card-header d-flex align-items-center gap-2 py-2"
            data-bs-toggle="collapse" data-bs-target="#collapseAnagrafica" role="button">
@@ -126,7 +126,7 @@ code { font-size: .78rem; }
       </div>
     </div>
 
-    <!-- ── Catena Partecipativa ── -->
+    <!-- Catena Partecipativa -->
     <div class="card section-card mb-3">
       <div class="card-header d-flex align-items-center gap-2 py-2">
         <i class="bi bi-diagram-3 text-primary"></i>
@@ -134,17 +134,16 @@ code { font-size: .78rem; }
         <div class="ms-auto d-flex align-items-center gap-2">
           <span class="text-muted small fw-normal">Strategia:</span>
           <select id="strategiaCalcolo" class="form-select form-select-sm py-0"
-                  style="width:auto;min-width:170px" onchange="updateStrategia(this.value)">
+                  style="width:auto;min-width:180px" onchange="updateStrategia(this.value)">
             <option value="Q">Q – Quantitativo</option>
-            <option value="D">D – Diretto</option>
-            <option value="I">I – Indiretto</option>
+            <option value="P">P – Poteri/Cariche</option>
           </select>
         </div>
       </div>
       <div class="card-body pb-2" id="catenaContent"></div>
     </div>
 
-    <!-- ── Anagrafiche ── -->
+    <!-- Anagrafiche -->
     <div class="card section-card mb-4">
       <div class="card-header d-flex align-items-center gap-2 py-2">
         <i class="bi bi-people text-primary"></i>
@@ -220,7 +219,7 @@ code { font-size: .78rem; }
   </div>
 </div>
 
-<!-- ══════════════ MODAL: TITOLARE EFFETTIVO ══════════════ -->
+<!-- ══════════════ MODAL: TITOLARE EFFETTIVO (strategia Q) ══════════════ -->
 <div class="modal fade" id="titolareModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -230,17 +229,16 @@ code { font-size: .78rem; }
       </div>
       <div class="modal-body">
         <div class="row g-3">
-          <!-- Identificativi -->
           <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0">Identificazione</h6></div>
           <div class="col-md-6">
             <label class="form-label fw-semibold">PK (Codice Fiscale) <span class="text-danger">*</span></label>
             <input type="text" id="tPk" class="form-control" style="text-transform:uppercase"
-                   placeholder="es. MGGDRD92M10L219E" oninput="this.value=this.value.toUpperCase();document.getElementById('tCF').value=this.value">
+                   placeholder="es. MGGDRD92M10L219E"
+                   oninput="this.value=this.value.toUpperCase();document.getElementById('tCF').value=this.value">
           </div>
           <div class="col-md-6">
             <label class="form-label fw-semibold">Codice Fiscale <span class="text-danger">*</span></label>
-            <input type="text" id="tCF" class="form-control" style="text-transform:uppercase"
-                   placeholder="es. MGGDRD92M10L219E">
+            <input type="text" id="tCF" class="form-control" style="text-transform:uppercase">
             <div class="form-text">Di solito uguale al PK</div>
           </div>
           <div class="col-12">
@@ -248,8 +246,6 @@ code { font-size: .78rem; }
             <input type="text" id="tDenominazione" class="form-control" style="text-transform:uppercase"
                    placeholder="es. MAGGIORI EDOARDO">
           </div>
-
-          <!-- Dati anagrafici -->
           <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Dati Anagrafici</h6></div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Sesso</label>
@@ -264,16 +260,12 @@ code { font-size: .78rem; }
           </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Stato di Nascita</label>
-            <input type="text" id="tStatoNascita" class="form-control" style="text-transform:uppercase"
-                   placeholder="ITALIA">
+            <input type="text" id="tStatoNascita" class="form-control" style="text-transform:uppercase" placeholder="ITALIA">
           </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Luogo di Nascita</label>
-            <input type="text" id="tLuogoNascita" class="form-control" style="text-transform:uppercase"
-                   placeholder="TORINO">
+            <input type="text" id="tLuogoNascita" class="form-control" style="text-transform:uppercase" placeholder="TORINO">
           </div>
-
-          <!-- Quote -->
           <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Quote &amp; Tipologia</h6></div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Tipologia Quantitativo</label>
@@ -285,19 +277,16 @@ code { font-size: .78rem; }
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Role % <span class="text-danger">*</span></label>
-            <input type="number" id="tRole" class="form-control" min="0" max="100" step="0.01"
-                   placeholder="es. 93.75">
+            <input type="number" id="tRole" class="form-control" min="0" max="100" step="0.01" placeholder="es. 93.75">
             <div class="form-text">Quota di partecipazione diretta</div>
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Quota Catena %</label>
-            <input type="number" id="tQuotaCatena" class="form-control" min="0" max="100" step="0.01"
-                   placeholder="es. 64.72">
+            <input type="number" id="tQuotaCatena" class="form-control" min="0" max="100" step="0.01" placeholder="es. 64.72">
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Totale Quota Cumulativa %</label>
-            <input type="number" id="tTotaleQuota" class="form-control" min="0" max="100" step="0.01"
-                   placeholder="es. 93.75">
+            <input type="number" id="tTotaleQuota" class="form-control" min="0" max="100" step="0.01" placeholder="es. 93.75">
           </div>
         </div>
       </div>
@@ -305,6 +294,90 @@ code { font-size: .78rem; }
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
         <button type="button" class="btn btn-primary" onclick="saveTitolare()">
           <i class="bi bi-check-lg me-1"></i>Salva Titolare
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: POTERE/CARICA (strategia P) ══════════════ -->
+<div class="modal fade" id="potereModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#4a1b8a">
+        <h5 class="modal-title" id="potereModalTitle">Potere / Carica</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0">Identificazione</h6></div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">PK (Codice Fiscale) <span class="text-danger">*</span></label>
+            <input type="text" id="pPk" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. RMRGRG63P24A944K"
+                   oninput="this.value=this.value.toUpperCase();document.getElementById('pCF').value=this.value">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Codice Fiscale</label>
+            <input type="text" id="pCF" class="form-control" style="text-transform:uppercase">
+            <div class="form-text">Di solito uguale al PK</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Denominazione (Cognome Nome) <span class="text-danger">*</span></label>
+            <input type="text" id="pDenominazione" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. GIORGIO ARMAROLI">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Carica <span class="text-danger">*</span></label>
+            <input type="text" id="pCarica" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. AMMINISTRATORE UNICO">
+          </div>
+
+          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Dati Anagrafici</h6></div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Tipo Soggetto</label>
+            <select id="pTipoSoggetto" class="form-select">
+              <option value="P">P – Persona Fisica</option>
+              <option value="S">S – Società</option>
+              <option value="A">A – Altro</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Sesso</label>
+            <select id="pSesso" class="form-select">
+              <option value="Man">Maschile</option>
+              <option value="Woman">Femminile</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Data di Nascita</label>
+            <input type="date" id="pDataNascita" class="form-control">
+            <div class="form-text">Salvato come GG-MM-AAAA</div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Livello</label>
+            <input type="text" id="pLivello" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. G">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Stato di Nascita</label>
+            <input type="text" id="pStatoNascita" class="form-control" style="text-transform:uppercase" placeholder="ITALIA">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Luogo di Nascita</label>
+            <input type="text" id="pLuogoNascita" class="form-control" style="text-transform:uppercase" placeholder="BOLOGNA (BO)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Indirizzo</label>
+            <input type="text" id="pIndirizzo" class="form-control" style="text-transform:uppercase">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-primary" style="background:#4a1b8a;border-color:#4a1b8a"
+                onclick="savePotere()">
+          <i class="bi bi-check-lg me-1"></i>Salva Potere/Carica
         </button>
       </div>
     </div>
@@ -353,10 +426,8 @@ code { font-size: .78rem; }
   </div>
 </div>
 
-<!-- Datalist PKs -->
 <datalist id="pkList"></datalist>
 
-<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
   <div id="toastMsg" class="toast align-items-center text-bg-success border-0" role="alert">
     <div class="d-flex">
@@ -372,14 +443,15 @@ code { font-size: .78rem; }
 //  STATE
 // ═══════════════════════════════════════════════════
 const state = {
-  jsonData: null,
-  filename: '',
-  editLegame: { pIdx: null, lIdx: null },
-  editTitolare: { pIdx: null, lIdx: null, tIdx: null },
+  jsonData:       null,
+  filename:       '',
+  editLegame:     { pIdx: null, lIdx: null },
+  editTitolare:   { pIdx: null, lIdx: null, tIdx: null },
+  editPotere:     null,
   editAnagrafica: null
 };
 
-let modLegame, modTitolare, modAnagrafica;
+let modLegame, modTitolare, modPotere, modAnagrafica;
 
 // ═══════════════════════════════════════════════════
 //  BOOT
@@ -387,6 +459,7 @@ let modLegame, modTitolare, modAnagrafica;
 document.addEventListener('DOMContentLoaded', () => {
   modLegame     = new bootstrap.Modal('#legameModal');
   modTitolare   = new bootstrap.Modal('#titolareModal');
+  modPotere     = new bootstrap.Modal('#potereModal');
   modAnagrafica = new bootstrap.Modal('#anagraficaModal');
 
   document.getElementById('fileInput').addEventListener('change', e => {
@@ -439,11 +512,15 @@ function validateJSON(d) {
   if (!r.anagrafica_soggetto?.pk)                  e.push('"anagrafica_soggetto.pk" mancante');
   if (!r.anagrafica_soggetto?.denominazione)       e.push('"anagrafica_soggetto.denominazione" mancante');
   if (!r.catena)                                   { e.push('"catena" mancante'); return e; }
-  if (!r.catena.strategia_calcolo)                 e.push('"catena.strategia_calcolo" mancante');
+  const strat = r.catena.strategia_calcolo;
+  if (!strat)                                      e.push('"catena.strategia_calcolo" mancante');
+  else if (strat !== 'Q' && strat !== 'P')         e.push(`"catena.strategia_calcolo" deve essere "Q" o "P" (trovato: "${strat}")`);
   if (!Array.isArray(r.catena.percorsi))           e.push('"catena.percorsi" non è un array');
   else r.catena.percorsi.forEach((p, i) => {
     if (!Array.isArray(p.percorso)) e.push(`"catena.percorsi[${i}].percorso" non è un array`);
   });
+  if (r.catena.poteri !== undefined && !Array.isArray(r.catena.poteri))
+    e.push('"catena.poteri" deve essere un array');
   if (!Array.isArray(r.anagrafiche))               e.push('"anagrafiche" non è un array');
   return e;
 }
@@ -494,14 +571,26 @@ function refreshPkList() {
     [...pks].map(pk => `<option value="${esc(pk)}">${esc(companyName(pk))}</option>`).join('');
 }
 
+// Date: ISO ↔ YYYY-MM-DD (for titolari, input type=date)
 function isoToDate(iso) {
   if (!iso) return '';
   try { return iso.substring(0, 10); } catch { return ''; }
 }
-
 function dateToISO(s) {
   if (!s) return '';
   try { return new Date(s + 'T00:00:00Z').toISOString(); } catch { return ''; }
+}
+
+// Date: DD-MM-YYYY ↔ YYYY-MM-DD (for poteri, input type=date)
+function ddmmyyyyToDate(s) {
+  if (!s) return '';
+  const p = s.split('-');
+  return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : '';
+}
+function dateToDDMMYYYY(s) {
+  if (!s) return '';
+  const p = s.split('-');
+  return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : '';
 }
 
 function fmtDate(iso) {
@@ -535,7 +624,6 @@ function renderAll() {
   refreshPkList();
 }
 
-// ── Azienda Indagata ──────────────────────────────
 function renderAnagraficaSoggetto() {
   const a = R().anagrafica_soggetto;
   const fields = [
@@ -555,9 +643,12 @@ function renderAnagraficaSoggetto() {
     ).join('') + '</div>';
 }
 
-// ── Catena ────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  CATENA
+// ═══════════════════════════════════════════════════
 function renderCatena() {
   const catena = R().catena;
+  const isP    = catena.strategia_calcolo === 'P';
   let html = '';
 
   catena.percorsi.forEach((percorsoObj, pIdx) => {
@@ -593,7 +684,6 @@ function renderCatena() {
     links.forEach((l, lIdx) => {
       const fromName = companyName(l.anagrafica_fornitore_from_pk);
       const toName   = companyName(l.anagrafica_fornitore_to_pk);
-      const hasTit   = l.titolari_effettivi && l.titolari_effettivi.length > 0;
 
       html += `<tr class="link-row">
         <td><span class="badge bg-secondary badge-lv">${esc(l.livello)}</span></td>
@@ -619,46 +709,50 @@ function renderCatena() {
             <i class="bi bi-trash"></i>
           </button>
         </td>
-      </tr>
-      <tr>
-        <td colspan="8" class="pt-0 pb-2" style="border-top:none">
-          <div class="titolari-block">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <i class="bi bi-person-badge small" style="color:#e67e22"></i>
-              <strong style="font-size:.78rem">Titolari Effettivi</strong>
-              <button class="btn btn-outline-success btn-sm py-0 px-2 ms-auto"
-                      style="font-size:.75rem"
-                      onclick="openTitolareModal(${pIdx},${lIdx},-1)">
-                <i class="bi bi-person-plus-fill me-1"></i>Aggiungi
-              </button>
+      </tr>`;
+
+      // ── Titolari Effettivi – solo strategia Q ──
+      if (!isP) {
+        const hasTit = l.titolari_effettivi && l.titolari_effettivi.length > 0;
+        html += `<tr>
+          <td colspan="8" class="pt-0 pb-2" style="border-top:none">
+            <div class="titolari-block">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-person-badge small" style="color:#e67e22"></i>
+                <strong style="font-size:.78rem">Titolari Effettivi</strong>
+                <button class="btn btn-outline-success btn-sm py-0 px-2 ms-auto"
+                        style="font-size:.75rem"
+                        onclick="openTitolareModal(${pIdx},${lIdx},-1)">
+                  <i class="bi bi-person-plus-fill me-1"></i>Aggiungi
+                </button>
+              </div>`;
+
+        if (hasTit) {
+          l.titolari_effettivi.forEach((t, tIdx) => {
+            html += `<div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+              <i class="bi bi-person-fill text-warning"></i>
+              <span class="fw-semibold">${esc(t.denominazione)}</span>
+              <code style="font-size:.72rem">${esc(t.pk)}</code>
+              <span class="badge bg-warning text-dark">${esc(t.totale_quota_cumulativa)}%</span>
+              <span class="text-muted small">${esc(t.tipologia_quantitativo || '')}</span>
+              <div class="ms-auto d-flex gap-1">
+                <button class="btn btn-outline-primary btn-sm py-0 px-1"
+                        onclick="openTitolareModal(${pIdx},${lIdx},${tIdx})" title="Modifica">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm py-0 px-1"
+                        onclick="confirmDeleteTitolare(${pIdx},${lIdx},${tIdx})" title="Elimina">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>`;
-
-      if (hasTit) {
-        l.titolari_effettivi.forEach((t, tIdx) => {
-          html += `<div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-            <i class="bi bi-person-fill text-warning"></i>
-            <span class="fw-semibold">${esc(t.denominazione)}</span>
-            <code style="font-size:.72rem">${esc(t.pk)}</code>
-            <span class="badge bg-warning text-dark">${esc(t.totale_quota_cumulativa)}%</span>
-            <span class="text-muted small">${esc(t.tipologia_quantitativo || '')}</span>
-            <div class="ms-auto d-flex gap-1">
-              <button class="btn btn-outline-primary btn-sm py-0 px-1"
-                      onclick="openTitolareModal(${pIdx},${lIdx},${tIdx})" title="Modifica">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-outline-danger btn-sm py-0 px-1"
-                      onclick="confirmDeleteTitolare(${pIdx},${lIdx},${tIdx})" title="Elimina">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </div>`;
-        });
-      } else {
-        html += `<span class="text-muted fst-italic" style="font-size:.78rem">
-                   Nessun titolare effettivo individuato</span>`;
+          });
+        } else {
+          html += `<span class="text-muted fst-italic" style="font-size:.78rem">
+                     Nessun titolare effettivo individuato</span>`;
+        }
+        html += `</div></td></tr>`;
       }
-
-      html += `</div></td></tr>`;
     });
 
     html += `</tbody></table></div>
@@ -669,18 +763,81 @@ function renderCatena() {
       </div>`;
   });
 
-  // Aggiungi Percorso
+  // ── Aggiungi Percorso ──
   html += `<div class="border-top pt-2 d-flex justify-content-end">
     <button class="btn btn-outline-secondary btn-sm" onclick="addPercorso()">
       <i class="bi bi-diagram-2 me-1"></i>Aggiungi Percorso
     </button>
   </div>`;
 
+  // ── Sezione Poteri – solo strategia P ──
+  if (isP) {
+    html += renderPoteriBlock();
+  }
+
   document.getElementById('catenaContent').innerHTML = html;
-  document.getElementById('strategiaCalcolo').value = R().catena.strategia_calcolo;
+  document.getElementById('strategiaCalcolo').value = catena.strategia_calcolo;
 }
 
-// ── Anagrafiche ───────────────────────────────────
+// ── Blocco Poteri ─────────────────────────────────
+function renderPoteriBlock() {
+  const poteri = R().catena.poteri || [];
+  let html = `
+  <div class="poteri-section mt-3">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi bi-person-lines-fill" style="color:#6610f2"></i>
+      <strong>Poteri e Cariche</strong>
+      <button class="btn btn-sm ms-auto fw-semibold"
+              style="background:#6610f2;color:#fff;border-color:#6610f2"
+              onclick="openPotereModal(-1)">
+        <i class="bi bi-person-plus-fill me-1"></i>Aggiungi
+      </button>
+    </div>`;
+
+  if (!poteri.length) {
+    html += `<p class="text-muted fst-italic small mb-0">Nessun potere/carica individuato</p>`;
+  } else {
+    html += `<div class="table-responsive">
+      <table class="table table-hover small mb-0" style="background:transparent">
+        <thead style="font-size:.78rem" class="text-muted">
+          <tr>
+            <th>PK / CF</th>
+            <th>Denominazione</th>
+            <th>Carica</th>
+            <th class="d-none d-md-table-cell">Data Nascita</th>
+            <th class="d-none d-lg-table-cell">Luogo Nascita</th>
+            <th style="width:60px">Livello</th>
+            <th style="width:90px" class="text-end">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    poteri.forEach((p, idx) => {
+      html += `<tr>
+        <td><code style="font-size:.72rem">${esc(p.pk)}</code></td>
+        <td class="fw-semibold">${esc(p.denominazione)}</td>
+        <td><span class="badge" style="background:#6610f2">${esc(p.carica)}</span></td>
+        <td class="d-none d-md-table-cell text-muted">${esc(p.data_nascita || '')}</td>
+        <td class="d-none d-lg-table-cell text-muted">${esc(p.luogo_nascita || '')}</td>
+        <td><span class="badge bg-secondary">${esc(p.livello || '')}</span></td>
+        <td class="text-end">
+          <button class="btn btn-outline-primary btn-sm py-0 px-1 me-1"
+                  onclick="openPotereModal(${idx})" title="Modifica">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm py-0 px-1"
+                  onclick="confirmDeletePotere(${idx})" title="Elimina">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// ─────────────────────────────────────────────────
 function renderAnagrafiche() {
   const list = R().anagrafiche;
   if (!list.length) {
@@ -727,6 +884,11 @@ function renderAnagrafiche() {
 // ═══════════════════════════════════════════════════
 function updateStrategia(val) {
   R().catena.strategia_calcolo = val;
+  // Inizializza poteri se si passa a P e non esiste già
+  if (val === 'P' && !Array.isArray(R().catena.poteri)) {
+    R().catena.poteri = [];
+  }
+  renderCatena();
   toast('Strategia aggiornata: ' + val);
 }
 
@@ -741,12 +903,12 @@ function openLegameModal(pIdx, lIdx) {
 
   if (!isNew) {
     const l = R().catena.percorsi[pIdx].percorso[lIdx];
-    document.getElementById('lFromPk').value    = l.anagrafica_fornitore_from_pk;
-    document.getElementById('lToPk').value      = l.anagrafica_fornitore_to_pk;
-    document.getElementById('lShares').value    = l.shares;
+    document.getElementById('lFromPk').value     = l.anagrafica_fornitore_from_pk;
+    document.getElementById('lToPk').value       = l.anagrafica_fornitore_to_pk;
+    document.getElementById('lShares').value     = l.shares;
     document.getElementById('lTipoLegame').value = l.tipo_legame;
-    document.getElementById('lLivello').value   = l.livello;
-    document.getElementById('lEtichetta').value = l.etichetta_grafo || '';
+    document.getElementById('lLivello').value    = l.livello;
+    document.getElementById('lEtichetta').value  = l.etichetta_grafo || '';
   } else {
     ['lFromPk','lToPk','lShares','lLivello','lEtichetta'].forEach(id =>
       document.getElementById(id).value = '');
@@ -757,12 +919,12 @@ function openLegameModal(pIdx, lIdx) {
 }
 
 function saveLegame() {
-  const fromPk   = document.getElementById('lFromPk').value.trim();
-  const toPk     = document.getElementById('lToPk').value.trim();
-  const shares   = document.getElementById('lShares').value.trim();
-  const tipo     = document.getElementById('lTipoLegame').value;
-  const livello  = document.getElementById('lLivello').value.trim();
-  const etich    = document.getElementById('lEtichetta').value.trim();
+  const fromPk  = document.getElementById('lFromPk').value.trim();
+  const toPk    = document.getElementById('lToPk').value.trim();
+  const shares  = document.getElementById('lShares').value.trim();
+  const tipo    = document.getElementById('lTipoLegame').value;
+  const livello = document.getElementById('lLivello').value.trim();
+  const etich   = document.getElementById('lEtichetta').value.trim();
 
   if (!fromPk || !toPk || !shares || !livello || !etich) {
     alert('Compila tutti i campi obbligatori (Da, A, Quote %, Livello, Etichetta Grafo).');
@@ -771,15 +933,14 @@ function saveLegame() {
 
   const { pIdx, lIdx } = state.editLegame;
   const percorso = R().catena.percorsi[pIdx].percorso;
-
   const obj = {
     shares: String(shares),
     anagrafica_fornitore_from_pk: fromPk,
     anagrafica_fornitore_to_pk:   toPk,
-    tipo_legame:    tipo,
-    livello:        String(livello),
+    tipo_legame:       tipo,
+    livello:           String(livello),
     titolari_effettivi: lIdx === -1 ? [] : percorso[lIdx].titolari_effettivi,
-    etichetta_grafo: etich
+    etichetta_grafo:   etich
   };
 
   if (lIdx === -1) percorso.push(obj);
@@ -801,7 +962,6 @@ function deleteLegame(pIdx, lIdx) {
   toast('Legame eliminato', 'warning');
 }
 
-// ── Percorso ────────────────────────────────
 function addPercorso() {
   R().catena.percorsi.push({ percorso: [] });
   renderCatena();
@@ -817,7 +977,7 @@ function confirmDeletePercorso(pIdx) {
 }
 
 // ═══════════════════════════════════════════════════
-//  TITOLARI EFFETTIVI CRUD
+//  TITOLARI EFFETTIVI CRUD (solo strategia Q)
 // ═══════════════════════════════════════════════════
 function openTitolareModal(pIdx, lIdx, tIdx) {
   state.editTitolare = { pIdx, lIdx, tIdx };
@@ -827,17 +987,17 @@ function openTitolareModal(pIdx, lIdx, tIdx) {
 
   if (!isNew) {
     const t = R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi[tIdx];
-    document.getElementById('tPk').value           = t.pk || '';
-    document.getElementById('tCF').value           = t.codice_fiscale || '';
+    document.getElementById('tPk').value            = t.pk || '';
+    document.getElementById('tCF').value            = t.codice_fiscale || '';
     document.getElementById('tDenominazione').value = t.denominazione || '';
-    document.getElementById('tSesso').value        = t.sesso || 'MALE';
-    document.getElementById('tDataNascita').value  = isoToDate(t.data_nascita);
-    document.getElementById('tStatoNascita').value = t.stato_nascita || '';
-    document.getElementById('tLuogoNascita').value = t.luogo_nascita || '';
-    document.getElementById('tTipologiaQ').value   = t.tipologia_quantitativo || 'Quantitativo indiretto';
-    document.getElementById('tRole').value         = t.role || '';
-    document.getElementById('tQuotaCatena').value  = t.quota_catena || '';
-    document.getElementById('tTotaleQuota').value  = t.totale_quota_cumulativa || '';
+    document.getElementById('tSesso').value         = t.sesso || 'MALE';
+    document.getElementById('tDataNascita').value   = isoToDate(t.data_nascita);
+    document.getElementById('tStatoNascita').value  = t.stato_nascita || '';
+    document.getElementById('tLuogoNascita').value  = t.luogo_nascita || '';
+    document.getElementById('tTipologiaQ').value    = t.tipologia_quantitativo || 'Quantitativo indiretto';
+    document.getElementById('tRole').value          = t.role || '';
+    document.getElementById('tQuotaCatena').value   = t.quota_catena || '';
+    document.getElementById('tTotaleQuota').value   = t.totale_quota_cumulativa || '';
   } else {
     ['tPk','tCF','tDenominazione','tStatoNascita','tLuogoNascita',
      'tRole','tQuotaCatena','tTotaleQuota','tDataNascita'].forEach(id =>
@@ -862,17 +1022,17 @@ function saveTitolare() {
   const totQuota    = document.getElementById('tTotaleQuota').value.trim() || role;
 
   const obj = {
-    pk:                      pk,
-    denominazione:            den,
-    codice_fiscale:           document.getElementById('tCF').value.trim().toUpperCase() || pk,
-    stato_nascita:            document.getElementById('tStatoNascita').value.trim().toUpperCase(),
-    luogo_nascita:            document.getElementById('tLuogoNascita').value.trim().toUpperCase(),
-    sesso:                    document.getElementById('tSesso').value,
-    role:                     String(role),
-    tipologia_quantitativo:   document.getElementById('tTipologiaQ').value,
-    quota_catena:             String(quotaCatena),
-    totale_quota_cumulativa:  String(totQuota),
-    data_nascita:             dateToISO(document.getElementById('tDataNascita').value)
+    pk:                     pk,
+    denominazione:           den,
+    codice_fiscale:          document.getElementById('tCF').value.trim().toUpperCase() || pk,
+    stato_nascita:           document.getElementById('tStatoNascita').value.trim().toUpperCase(),
+    luogo_nascita:           document.getElementById('tLuogoNascita').value.trim().toUpperCase(),
+    sesso:                   document.getElementById('tSesso').value,
+    role:                    String(role),
+    tipologia_quantitativo:  document.getElementById('tTipologiaQ').value,
+    quota_catena:            String(quotaCatena),
+    totale_quota_cumulativa: String(totQuota),
+    data_nascita:            dateToISO(document.getElementById('tDataNascita').value)
   };
 
   const { pIdx, lIdx, tIdx } = state.editTitolare;
@@ -894,6 +1054,85 @@ function deleteTitolare(pIdx, lIdx, tIdx) {
   R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi.splice(tIdx, 1);
   renderCatena();
   toast('Titolare eliminato', 'warning');
+}
+
+// ═══════════════════════════════════════════════════
+//  POTERI CRUD (solo strategia P)
+// ═══════════════════════════════════════════════════
+function openPotereModal(idx) {
+  state.editPotere = idx;
+  const isNew = idx === -1;
+  document.getElementById('potereModalTitle').textContent =
+    isNew ? 'Aggiungi Potere / Carica' : 'Modifica Potere / Carica';
+
+  if (!isNew) {
+    const p = R().catena.poteri[idx];
+    document.getElementById('pPk').value            = p.pk || '';
+    document.getElementById('pCF').value            = p.codice_fiscale || '';
+    document.getElementById('pDenominazione').value = p.denominazione || '';
+    document.getElementById('pCarica').value        = p.carica || '';
+    document.getElementById('pTipoSoggetto').value  = p.tipo_soggetto || 'P';
+    document.getElementById('pSesso').value         = p.sesso || 'Man';
+    document.getElementById('pDataNascita').value   = ddmmyyyyToDate(p.data_nascita);
+    document.getElementById('pLivello').value       = p.livello || '';
+    document.getElementById('pStatoNascita').value  = p.stato_nascita || '';
+    document.getElementById('pLuogoNascita').value  = p.luogo_nascita || '';
+    document.getElementById('pIndirizzo').value     = p.indirizzo || '';
+  } else {
+    ['pPk','pCF','pDenominazione','pCarica','pLivello',
+     'pStatoNascita','pLuogoNascita','pIndirizzo','pDataNascita'].forEach(id =>
+      document.getElementById(id).value = '');
+    document.getElementById('pTipoSoggetto').value = 'P';
+    document.getElementById('pSesso').value        = 'Man';
+  }
+  modPotere.show();
+}
+
+function savePotere() {
+  const pk    = document.getElementById('pPk').value.trim().toUpperCase();
+  const den   = document.getElementById('pDenominazione').value.trim().toUpperCase();
+  const carica = document.getElementById('pCarica').value.trim().toUpperCase();
+
+  if (!pk || !den || !carica) {
+    alert('Compila i campi obbligatori: PK, Denominazione, Carica.');
+    return;
+  }
+
+  const obj = {
+    pk:             pk,
+    tipo_soggetto:  document.getElementById('pTipoSoggetto').value,
+    denominazione:  den,
+    codice_fiscale: document.getElementById('pCF').value.trim().toUpperCase() || pk,
+    indirizzo:      document.getElementById('pIndirizzo').value.trim().toUpperCase(),
+    stato_nascita:  document.getElementById('pStatoNascita').value.trim().toUpperCase(),
+    luogo_nascita:  document.getElementById('pLuogoNascita').value.trim().toUpperCase(),
+    sesso:          document.getElementById('pSesso').value,
+    carica:         carica,
+    data_nascita:   dateToDDMMYYYY(document.getElementById('pDataNascita').value),
+    livello:        document.getElementById('pLivello').value.trim().toUpperCase()
+  };
+
+  const idx = state.editPotere;
+  if (!Array.isArray(R().catena.poteri)) R().catena.poteri = [];
+  const list = R().catena.poteri;
+
+  if (idx === -1) list.push(obj);
+  else           list[idx] = obj;
+
+  modPotere.hide();
+  renderCatena();
+  toast(idx === -1 ? 'Potere/carica aggiunto' : 'Potere/carica modificato');
+}
+
+function confirmDeletePotere(idx) {
+  const p = R().catena.poteri[idx];
+  if (confirm(`Eliminare "${p.denominazione}" (${p.carica})?`))
+    deletePotere(idx);
+}
+function deletePotere(idx) {
+  R().catena.poteri.splice(idx, 1);
+  renderCatena();
+  toast('Potere/carica eliminato', 'warning');
 }
 
 // ═══════════════════════════════════════════════════
@@ -919,8 +1158,8 @@ function openAnagraficaModal(idx) {
 }
 
 function saveAnagrafica() {
-  const pk  = document.getElementById('aPk').value.trim();
-  const rs  = document.getElementById('aRagioneSociale').value.trim().toUpperCase();
+  const pk = document.getElementById('aPk').value.trim();
+  const rs = document.getElementById('aRagioneSociale').value.trim().toUpperCase();
 
   if (!pk || !rs) {
     alert('Compila i campi obbligatori: PK e Ragione Sociale.');
@@ -928,10 +1167,10 @@ function saveAnagrafica() {
   }
 
   const obj = {
-    pk:             pk,
+    pk:              pk,
     ragione_sociale: rs,
-    piva:           document.getElementById('aPiva').value.trim() || pk,
-    indirizzo:      document.getElementById('aIndirizzo').value.trim().toUpperCase()
+    piva:            document.getElementById('aPiva').value.trim() || pk,
+    indirizzo:       document.getElementById('aIndirizzo').value.trim().toUpperCase()
   };
 
   const idx  = state.editAnagrafica;
