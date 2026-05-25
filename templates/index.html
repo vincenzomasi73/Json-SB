@@ -3,111 +3,272 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Json-SB – Editor Titolare Effettivo</title>
+<title>Json-SB – Editor Titolare Effettivo | Complify</title>
+<link rel="icon" type="image/png" href="/static/img/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Slab:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-:root { --brand: #0a3d62; }
-body { background: #f0f2f5; font-size: .9rem; }
+/* ── Complify Design Tokens ─────────────────── */
+:root {
+  --brand:       #14658B;
+  --brand-dark:  #0e4d69;
+  --brand-light: #1a7cb5;
+  --teal:        #4DC8C8;
+  --teal-dark:   #35a8a8;
+  --teal-bg:     #f0fbfb;
+  --amber:       #e8a010;
+  --amber-bg:    #fffbef;
+  --text:        #54595F;
+  --text-light:  #7A7A7A;
+  --bg:          #f2f6f9;
+  --card-radius: 10px;
+  --shadow:      0 2px 8px rgba(20,101,139,.12);
+}
 
-.upload-zone {
-  border: 2.5px dashed #ced4da;
+/* ── Base ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text);
+  font-size: .9rem;
+}
+
+/* ── Upload screen ───────────────────────── */
+.upload-screen-bg {
+  min-height: 100vh;
+  background: linear-gradient(150deg, #e8f4fa 0%, #f2f6f9 60%, #e8f4fa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.upload-card {
+  background: #fff;
   border-radius: 16px;
-  padding: 60px 30px;
+  box-shadow: 0 8px 32px rgba(20,101,139,.15);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 500px;
+}
+.upload-zone {
+  border: 2px dashed #c6dce6;
+  border-radius: 12px;
+  padding: 48px 24px;
   text-align: center;
   cursor: pointer;
-  transition: all .25s;
-  background: #fff;
+  transition: all .2s;
+  background: #f8fbfd;
 }
-.upload-zone.dragover,
-.upload-zone:hover { border-color: var(--brand); background: #eaf1fb; }
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--brand);
+  background: #edf5fa;
+}
 
-.main-navbar { background: var(--brand) !important; }
+/* ── Navbar ──────────────────────────────── */
+.main-navbar {
+  background: var(--brand) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.navbar-logo {
+  height: 28px;
+  width: auto;
+  filter: brightness(0) invert(1); /* assicura bianco se logo non è già bianco */
+}
+.nav-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,.3);
+}
+.nav-product-badge {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: #fff;
+}
 
-.section-card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+/* ── Cards ───────────────────────────────── */
+.section-card {
+  background: #fff;
+  border: none;
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
 .section-card .card-header {
   background: #fff;
-  border-bottom: 2px solid #f0f2f5;
+  border-bottom: 1px solid #edf2f5;
   font-weight: 600;
-  font-size: .95rem;
+  font-size: .9rem;
+  padding: .6rem 1rem;
+}
+.section-card .card-header .section-icon {
+  color: var(--brand);
 }
 
+/* ── Chain table ─────────────────────────── */
+.chain-table { border-collapse: separate; border-spacing: 0; }
 .chain-table td { vertical-align: middle; }
 .chain-table .link-row { background: #fff; }
+.chain-table tbody tr:hover { background: #f8fbfd !important; }
 
-/* Titolari – solo quando strategia Q */
+/* ── Titolari block (strategia Q) ─────────── */
 .titolari-block {
-  background: #fffcf0;
-  border-left: 3px solid #ffc107;
+  background: var(--amber-bg);
+  border-left: 3px solid var(--amber);
   padding: 8px 12px 6px;
   border-radius: 0 8px 8px 0;
   margin: 0 0 2px 20px;
 }
 
-/* Poteri – solo quando strategia P */
+/* ── Poteri block (strategia P) ───────────── */
 .poteri-section {
-  background: #f0f4ff;
-  border-left: 3px solid #6610f2;
-  padding: 10px 14px 8px;
+  background: var(--teal-bg);
+  border-left: 3px solid var(--teal);
+  padding: 12px 14px 10px;
   border-radius: 0 8px 8px 0;
+  margin-top: 1rem;
 }
 
-.modal-header { background: var(--brand); color: #fff; }
+/* ── Modals ──────────────────────────────── */
+.modal-header-brand     { background: var(--brand); color: #fff; }
+.modal-header-teal      { background: var(--teal-dark); color: #fff; }
+.modal-header-anagrafica{ background: var(--text); color: #fff; }
 .btn-close-white { filter: invert(1); }
-.badge-lv { font-size: .75rem; min-width: 26px; }
-code { font-size: .78rem; }
-.field-label { font-size: .75rem; color: #6c757d; }
+
+/* ── Badges ──────────────────────────────── */
+.badge-lv    { font-size: .72rem; min-width: 26px; background: var(--brand) !important; }
+.badge-share { background: var(--brand) !important; }
+.badge-tipo  { background: var(--teal) !important; color: #fff !important; }
+.badge-poteri{ background: var(--teal-dark) !important; }
+
+/* ── Buttons ─────────────────────────────── */
+.btn-brand {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.btn-brand:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+  color: #fff;
+}
+.btn-teal {
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
+  color: #fff;
+}
+.btn-teal:hover {
+  background: #2a9090;
+  border-color: #2a9090;
+  color: #fff;
+}
+.btn-download {
+  background: #fff;
+  border-color: #fff;
+  color: var(--brand);
+  font-weight: 600;
+}
+.btn-download:hover {
+  background: #e8f4fa;
+  border-color: #e8f4fa;
+  color: var(--brand-dark);
+}
+
+/* ── Misc ────────────────────────────────── */
+code        { font-size: .76rem; color: var(--brand-dark); }
+.field-label{ font-size: .73rem; color: var(--text-light); margin-bottom: 1px; }
+.form-select:focus,
+.form-control:focus { border-color: var(--brand); box-shadow: 0 0 0 .2rem rgba(20,101,139,.15); }
+
+/* Upload screen divider */
+.brand-divider {
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand) 0%, var(--teal) 100%);
+  border-radius: 2px;
+  margin: 1.25rem 0;
+}
 </style>
 </head>
 <body>
 
-<!-- ══════════════ UPLOAD SCREEN ══════════════ -->
-<div id="uploadScreen" class="min-vh-100 d-flex align-items-center justify-content-center p-3">
-  <div style="width:100%;max-width:520px">
+<!-- ══════════════════════════════════════════
+     UPLOAD SCREEN
+══════════════════════════════════════════ -->
+<div id="uploadScreen" class="upload-screen-bg">
+  <div class="upload-card">
+    <!-- Logo -->
+    <div class="text-center mb-3">
+      <img src="/static/img/logo_color.png" alt="Complify" style="height:48px;width:auto">
+    </div>
+
+    <div class="brand-divider"></div>
+
     <div class="text-center mb-4">
-      <i class="bi bi-diagram-3" style="font-size:3.2rem;color:var(--brand)"></i>
-      <h1 class="fw-bold mt-2 mb-0" style="color:var(--brand)">Json-SB</h1>
-      <p class="text-muted">Editor Titolare Effettivo</p>
+      <h5 class="fw-600 mb-1" style="color:var(--brand);font-family:'Roboto Slab',serif;font-weight:600">
+        Json-SB
+      </h5>
+      <p class="text-muted small mb-0">Editor Titolare Effettivo</p>
     </div>
-    <div class="card section-card">
-      <div class="card-body p-4">
-        <div class="upload-zone" id="uploadZone">
-          <i class="bi bi-cloud-upload" style="font-size:2.8rem;color:#adb5bd"></i>
-          <h5 class="mt-3 mb-1">Carica il file JSON</h5>
-          <p class="text-muted small mb-3">Trascina qui il file o clicca per selezionarlo</p>
-          <button class="btn btn-primary px-4" onclick="document.getElementById('fileInput').click()">
-            <i class="bi bi-folder2-open me-2"></i>Seleziona file
-          </button>
-          <input type="file" id="fileInput" accept=".json,application/json" class="d-none">
-        </div>
-        <div id="uploadError" class="alert alert-danger mt-3 d-none small mb-0"></div>
-      </div>
+
+    <div class="upload-zone" id="uploadZone">
+      <i class="bi bi-cloud-upload" style="font-size:2.4rem;color:#9bbfcf"></i>
+      <h6 class="mt-3 mb-1 fw-500" style="color:var(--text)">Carica il file JSON</h6>
+      <p class="text-muted small mb-3">Trascina qui il file o clicca per selezionarlo</p>
+      <button class="btn btn-brand px-4" onclick="document.getElementById('fileInput').click()">
+        <i class="bi bi-folder2-open me-2"></i>Seleziona file
+      </button>
+      <input type="file" id="fileInput" accept=".json,application/json" class="d-none">
     </div>
-    <p class="text-center text-muted small mt-3">
+
+    <div id="uploadError" class="alert alert-danger mt-3 d-none small mb-0"></div>
+
+    <p class="text-center text-muted mt-3 mb-0" style="font-size:.75rem">
       Formati supportati: JSON catena partecipativa SolutionBank (strategia Q e P)
     </p>
   </div>
 </div>
 
-<!-- ══════════════ EDITOR SCREEN ══════════════ -->
+<!-- ══════════════════════════════════════════
+     EDITOR SCREEN
+══════════════════════════════════════════ -->
 <div id="editorScreen" class="d-none">
 
-  <nav class="navbar main-navbar sticky-top shadow-sm py-2">
-    <div class="container-fluid">
-      <div class="d-flex align-items-center gap-2 overflow-hidden">
-        <i class="bi bi-diagram-3 text-white fs-5 flex-shrink-0"></i>
-        <span class="fw-bold text-white text-truncate" id="navCompanyName" style="font-size:1rem"></span>
-        <span class="badge bg-light text-dark flex-shrink-0 d-none d-md-inline" id="navPiva"></span>
-      </div>
+  <!-- Navbar -->
+  <nav class="navbar main-navbar sticky-top py-2">
+    <div class="container-fluid gap-2">
+
+      <!-- Brand: logo + prodotto -->
       <div class="d-flex align-items-center gap-2 flex-shrink-0">
-        <small class="text-white-50 d-none d-lg-block" id="navDate"></small>
+        <img src="/static/img/logo_bianco.png" alt="Complify" class="navbar-logo">
+        <div class="nav-divider d-none d-md-block"></div>
+        <span class="nav-product-badge d-none d-md-inline">Json-SB</span>
+      </div>
+
+      <!-- Azienda in lavorazione -->
+      <div class="d-flex align-items-center gap-2 overflow-hidden flex-grow-1 px-2">
+        <i class="bi bi-building text-white-50 flex-shrink-0 d-none d-lg-block"></i>
+        <span class="fw-500 text-white text-truncate" id="navCompanyName" style="font-size:.9rem"></span>
+        <span class="badge bg-white text-primary flex-shrink-0 d-none d-md-inline" style="color:var(--brand)!important;font-size:.7rem" id="navPiva"></span>
+      </div>
+
+      <!-- Azioni -->
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <small class="text-white-50 d-none d-xl-block" id="navDate"></small>
         <button class="btn btn-outline-light btn-sm" onclick="showUpload()">
           <i class="bi bi-folder2-open me-1"></i><span class="d-none d-sm-inline">Nuovo</span>
         </button>
-        <button class="btn btn-warning btn-sm fw-bold" onclick="downloadJSON()">
+        <button class="btn btn-download btn-sm" onclick="downloadJSON()">
           <i class="bi bi-download me-1"></i>Scarica JSON
         </button>
       </div>
+
     </div>
   </nav>
 
@@ -115,9 +276,9 @@ code { font-size: .78rem; }
 
     <!-- Azienda Indagata -->
     <div class="card section-card mb-3">
-      <div class="card-header d-flex align-items-center gap-2 py-2"
+      <div class="card-header d-flex align-items-center gap-2"
            data-bs-toggle="collapse" data-bs-target="#collapseAnagrafica" role="button">
-        <i class="bi bi-building text-primary"></i>
+        <i class="bi bi-building section-icon"></i>
         <span>Azienda Indagata</span>
         <i class="bi bi-chevron-down ms-auto text-muted small"></i>
       </div>
@@ -128,13 +289,13 @@ code { font-size: .78rem; }
 
     <!-- Catena Partecipativa -->
     <div class="card section-card mb-3">
-      <div class="card-header d-flex align-items-center gap-2 py-2">
-        <i class="bi bi-diagram-3 text-primary"></i>
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-diagram-3 section-icon"></i>
         <span>Catena Partecipativa</span>
         <div class="ms-auto d-flex align-items-center gap-2">
           <span class="text-muted small fw-normal">Strategia:</span>
           <select id="strategiaCalcolo" class="form-select form-select-sm py-0"
-                  style="width:auto;min-width:180px" onchange="updateStrategia(this.value)">
+                  style="width:auto;min-width:185px" onchange="updateStrategia(this.value)">
             <option value="Q">Q – Quantitativo</option>
             <option value="P">P – Poteri/Cariche</option>
           </select>
@@ -145,10 +306,10 @@ code { font-size: .78rem; }
 
     <!-- Anagrafiche -->
     <div class="card section-card mb-4">
-      <div class="card-header d-flex align-items-center gap-2 py-2">
-        <i class="bi bi-people text-primary"></i>
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-people section-icon"></i>
         <span>Anagrafiche Aziende Collegate</span>
-        <button class="btn btn-primary btn-sm ms-auto" onclick="openAnagraficaModal(-1)">
+        <button class="btn btn-brand btn-sm ms-auto" onclick="openAnagraficaModal(-1)">
           <i class="bi bi-plus-lg me-1"></i>Aggiungi
         </button>
       </div>
@@ -158,11 +319,13 @@ code { font-size: .78rem; }
   </div>
 </div>
 
-<!-- ══════════════ MODAL: LEGAME ══════════════ -->
+<!-- ══════════════════════════════════════════
+     MODAL: LEGAME
+══════════════════════════════════════════ -->
 <div class="modal fade" id="legameModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header modal-header-brand">
         <h5 class="modal-title" id="legameModalTitle">Legame</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
@@ -182,8 +345,7 @@ code { font-size: .78rem; }
           </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Quote % <span class="text-danger">*</span></label>
-            <input type="number" id="lShares" class="form-control" min="0" max="100"
-                   step="0.01" placeholder="es. 93.75">
+            <input type="number" id="lShares" class="form-control" min="0" max="100" step="0.01" placeholder="es. 93.75">
           </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Tipo Legame <span class="text-danger">*</span></label>
@@ -204,14 +366,14 @@ code { font-size: .78rem; }
             <input type="text" id="lEtichetta" class="form-control" placeholder="es. 1.1">
           </div>
         </div>
-        <div class="alert alert-info mt-3 small mb-0">
+        <div class="alert alert-info mt-3 small mb-0" style="background:#edf5fa;border-color:#b8d9ea;color:var(--brand)">
           <i class="bi bi-info-circle me-1"></i>
-          Se l'azienda non è ancora in <strong>Anagrafiche</strong>, aggiungila prima dalla sezione apposita.
+          Se l'azienda non è ancora presente in <strong>Anagrafiche</strong>, aggiungila prima dalla sezione apposita.
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-primary" onclick="saveLegame()">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-brand" onclick="saveLegame()">
           <i class="bi bi-check-lg me-1"></i>Salva Legame
         </button>
       </div>
@@ -219,17 +381,23 @@ code { font-size: .78rem; }
   </div>
 </div>
 
-<!-- ══════════════ MODAL: TITOLARE EFFETTIVO (strategia Q) ══════════════ -->
+<!-- ══════════════════════════════════════════
+     MODAL: TITOLARE EFFETTIVO (strategia Q)
+══════════════════════════════════════════ -->
 <div class="modal fade" id="titolareModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header modal-header-brand">
         <h5 class="modal-title" id="titolareModalTitle">Titolare Effettivo</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
-          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0">Identificazione</h6></div>
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom" style="color:var(--brand);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">
+              Identificazione
+            </h6>
+          </div>
           <div class="col-md-6">
             <label class="form-label fw-semibold">PK (Codice Fiscale) <span class="text-danger">*</span></label>
             <input type="text" id="tPk" class="form-control" style="text-transform:uppercase"
@@ -246,7 +414,12 @@ code { font-size: .78rem; }
             <input type="text" id="tDenominazione" class="form-control" style="text-transform:uppercase"
                    placeholder="es. MAGGIORI EDOARDO">
           </div>
-          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Dati Anagrafici</h6></div>
+
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom mt-1" style="color:var(--brand);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">
+              Dati Anagrafici
+            </h6>
+          </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Sesso</label>
             <select id="tSesso" class="form-select">
@@ -266,7 +439,12 @@ code { font-size: .78rem; }
             <label class="form-label fw-semibold">Luogo di Nascita</label>
             <input type="text" id="tLuogoNascita" class="form-control" style="text-transform:uppercase" placeholder="TORINO">
           </div>
-          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Quote &amp; Tipologia</h6></div>
+
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom mt-1" style="color:var(--brand);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">
+              Quote &amp; Tipologia
+            </h6>
+          </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Tipologia Quantitativo</label>
             <select id="tTipologiaQ" class="form-select">
@@ -291,8 +469,8 @@ code { font-size: .78rem; }
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-primary" onclick="saveTitolare()">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-brand" onclick="saveTitolare()">
           <i class="bi bi-check-lg me-1"></i>Salva Titolare
         </button>
       </div>
@@ -300,17 +478,23 @@ code { font-size: .78rem; }
   </div>
 </div>
 
-<!-- ══════════════ MODAL: POTERE/CARICA (strategia P) ══════════════ -->
+<!-- ══════════════════════════════════════════
+     MODAL: POTERE/CARICA (strategia P)
+══════════════════════════════════════════ -->
 <div class="modal fade" id="potereModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header" style="background:#4a1b8a">
+      <div class="modal-header modal-header-teal">
         <h5 class="modal-title" id="potereModalTitle">Potere / Carica</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
-          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0">Identificazione</h6></div>
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom" style="color:var(--teal-dark);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">
+              Identificazione
+            </h6>
+          </div>
           <div class="col-md-6">
             <label class="form-label fw-semibold">PK (Codice Fiscale) <span class="text-danger">*</span></label>
             <input type="text" id="pPk" class="form-control" style="text-transform:uppercase"
@@ -333,7 +517,11 @@ code { font-size: .78rem; }
                    placeholder="es. AMMINISTRATORE UNICO">
           </div>
 
-          <div class="col-12"><h6 class="text-muted border-bottom pb-1 mb-0 mt-1">Dati Anagrafici</h6></div>
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom mt-1" style="color:var(--teal-dark);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">
+              Dati Anagrafici
+            </h6>
+          </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Tipo Soggetto</label>
             <select id="pTipoSoggetto" class="form-select">
@@ -356,8 +544,7 @@ code { font-size: .78rem; }
           </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Livello</label>
-            <input type="text" id="pLivello" class="form-control" style="text-transform:uppercase"
-                   placeholder="es. G">
+            <input type="text" id="pLivello" class="form-control" style="text-transform:uppercase" placeholder="es. G">
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Stato di Nascita</label>
@@ -374,9 +561,8 @@ code { font-size: .78rem; }
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-primary" style="background:#4a1b8a;border-color:#4a1b8a"
-                onclick="savePotere()">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-teal" onclick="savePotere()">
           <i class="bi bi-check-lg me-1"></i>Salva Potere/Carica
         </button>
       </div>
@@ -384,11 +570,13 @@ code { font-size: .78rem; }
   </div>
 </div>
 
-<!-- ══════════════ MODAL: ANAGRAFICA ══════════════ -->
+<!-- ══════════════════════════════════════════
+     MODAL: ANAGRAFICA
+══════════════════════════════════════════ -->
 <div class="modal fade" id="anagraficaModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header modal-header-anagrafica">
         <h5 class="modal-title" id="anagraficaModalTitle">Anagrafica</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
@@ -407,7 +595,7 @@ code { font-size: .78rem; }
           <div class="col-12">
             <label class="form-label fw-semibold">PIVA</label>
             <input type="text" id="aPiva" class="form-control" placeholder="es. 10222650961">
-            <div class="form-text">Se diversa dal PK, altrimenti lasciare vuoto</div>
+            <div class="form-text">Se diversa dal PK; altrimenti lasciare vuoto</div>
           </div>
           <div class="col-12">
             <label class="form-label fw-semibold">Indirizzo</label>
@@ -417,8 +605,8 @@ code { font-size: .78rem; }
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-primary" onclick="saveAnagrafica()">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-brand" onclick="saveAnagrafica()">
           <i class="bi bi-check-lg me-1"></i>Salva Anagrafica
         </button>
       </div>
@@ -428,8 +616,9 @@ code { font-size: .78rem; }
 
 <datalist id="pkList"></datalist>
 
+<!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
-  <div id="toastMsg" class="toast align-items-center text-bg-success border-0" role="alert">
+  <div id="toastMsg" class="toast align-items-center border-0" role="alert">
     <div class="d-flex">
       <div class="toast-body fw-semibold" id="toastBody"></div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -521,7 +710,7 @@ function validateJSON(d) {
   });
   if (r.catena.poteri !== undefined && !Array.isArray(r.catena.poteri))
     e.push('"catena.poteri" deve essere un array');
-  if (!Array.isArray(r.anagrafiche))               e.push('"anagrafiche" non è un array');
+  if (!Array.isArray(r.anagrafiche)) e.push('"anagrafiche" non è un array');
   return e;
 }
 
@@ -571,36 +760,16 @@ function refreshPkList() {
     [...pks].map(pk => `<option value="${esc(pk)}">${esc(companyName(pk))}</option>`).join('');
 }
 
-// Date: ISO ↔ YYYY-MM-DD (for titolari, input type=date)
-function isoToDate(iso) {
-  if (!iso) return '';
-  try { return iso.substring(0, 10); } catch { return ''; }
-}
-function dateToISO(s) {
-  if (!s) return '';
-  try { return new Date(s + 'T00:00:00Z').toISOString(); } catch { return ''; }
-}
-
-// Date: DD-MM-YYYY ↔ YYYY-MM-DD (for poteri, input type=date)
-function ddmmyyyyToDate(s) {
-  if (!s) return '';
-  const p = s.split('-');
-  return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : '';
-}
-function dateToDDMMYYYY(s) {
-  if (!s) return '';
-  const p = s.split('-');
-  return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : '';
-}
-
-function fmtDate(iso) {
-  if (!iso) return '';
-  try { return new Date(iso).toLocaleDateString('it-IT'); } catch { return iso; }
-}
+function isoToDate(iso)    { return iso ? iso.substring(0, 10) : ''; }
+function dateToISO(s)      { if (!s) return ''; try { return new Date(s + 'T00:00:00Z').toISOString(); } catch { return ''; } }
+function ddmmyyyyToDate(s) { if (!s) return ''; const p = s.split('-'); return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : ''; }
+function dateToDDMMYYYY(s) { if (!s) return ''; const p = s.split('-'); return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : ''; }
+function fmtDate(iso)      { if (!iso) return ''; try { return new Date(iso).toLocaleDateString('it-IT'); } catch { return iso; } }
 
 function toast(msg, type = 'success') {
   const el = document.getElementById('toastMsg');
-  el.className = `toast align-items-center text-bg-${type} border-0`;
+  const map = { success: 'text-bg-success', warning: 'text-bg-warning', danger: 'text-bg-danger' };
+  el.className = `toast align-items-center border-0 ${map[type] || 'text-bg-success'}`;
   document.getElementById('toastBody').textContent = msg;
   bootstrap.Toast.getOrCreateInstance(el, { delay: 3000 }).show();
 }
@@ -616,8 +785,8 @@ function esc(s) {
 function renderAll() {
   const r = R();
   document.getElementById('navCompanyName').textContent = r.anagrafica_soggetto.denominazione;
-  document.getElementById('navPiva').textContent = 'PIVA: ' + r.anagrafica_soggetto.piva;
-  document.getElementById('navDate').textContent = 'Data evasione: ' + fmtDate(r.dt_evasione);
+  document.getElementById('navPiva').textContent = r.anagrafica_soggetto.piva;
+  document.getElementById('navDate').textContent = 'Evasione: ' + fmtDate(r.dt_evasione);
   renderAnagraficaSoggetto();
   renderCatena();
   renderAnagrafiche();
@@ -639,7 +808,7 @@ function renderAnagraficaSoggetto() {
   document.getElementById('anagraficaSoggettoContent').innerHTML =
     '<div class="row row-cols-auto g-3">' +
     fields.map(([k, v]) =>
-      `<div class="col"><div class="field-label">${esc(k)}</div><strong>${esc(v)}</strong></div>`
+      `<div class="col"><div class="field-label">${esc(k)}</div><strong style="color:var(--text)">${esc(v)}</strong></div>`
     ).join('') + '</div>';
 }
 
@@ -667,16 +836,16 @@ function renderCatena() {
 
     html += `<div class="table-responsive mb-1">
       <table class="table chain-table table-hover mb-0 small">
-        <thead class="table-light text-muted" style="font-size:.78rem">
+        <thead class="text-muted" style="font-size:.76rem;background:#f8fbfd">
           <tr>
             <th style="width:40px">Lv.</th>
             <th>Da Società</th>
-            <th style="width:24px" class="text-center"></th>
+            <th style="width:22px" class="text-center"></th>
             <th>A Società</th>
-            <th style="width:80px">Quote</th>
-            <th style="width:60px">Tipo</th>
-            <th style="width:90px">Etichetta</th>
-            <th style="width:90px" class="text-end">Azioni</th>
+            <th style="width:78px">Quote</th>
+            <th style="width:58px">Tipo</th>
+            <th style="width:88px">Etichetta</th>
+            <th style="width:88px" class="text-end">Azioni</th>
           </tr>
         </thead>
         <tbody>`;
@@ -686,57 +855,55 @@ function renderCatena() {
       const toName   = companyName(l.anagrafica_fornitore_to_pk);
 
       html += `<tr class="link-row">
-        <td><span class="badge bg-secondary badge-lv">${esc(l.livello)}</span></td>
+        <td><span class="badge badge-lv">${esc(l.livello)}</span></td>
         <td>
-          <div class="fw-semibold">${esc(fromName)}</div>
-          <div class="text-muted" style="font-size:.72rem">${esc(l.anagrafica_fornitore_from_pk)}</div>
+          <div class="fw-500" style="color:var(--text)">${esc(fromName)}</div>
+          <div style="font-size:.7rem;color:var(--text-light)">${esc(l.anagrafica_fornitore_from_pk)}</div>
         </td>
-        <td class="text-center text-muted px-0"><i class="bi bi-arrow-right"></i></td>
+        <td class="text-center" style="color:var(--text-light)"><i class="bi bi-arrow-right"></i></td>
         <td>
-          <div class="fw-semibold">${esc(toName)}</div>
-          <div class="text-muted" style="font-size:.72rem">${esc(l.anagrafica_fornitore_to_pk)}</div>
+          <div class="fw-500" style="color:var(--text)">${esc(toName)}</div>
+          <div style="font-size:.7rem;color:var(--text-light)">${esc(l.anagrafica_fornitore_to_pk)}</div>
         </td>
-        <td><span class="badge bg-primary">${esc(l.shares)}%</span></td>
-        <td><span class="badge bg-info text-dark">${esc(l.tipo_legame)}</span></td>
+        <td><span class="badge badge-share">${esc(l.shares)}%</span></td>
+        <td><span class="badge badge-tipo">${esc(l.tipo_legame)}</span></td>
         <td><code>${esc(l.etichetta_grafo || '')}</code></td>
         <td class="text-end">
-          <button class="btn btn-outline-primary btn-sm py-0 px-1 me-1"
-                  onclick="openLegameModal(${pIdx},${lIdx})" title="Modifica legame">
+          <button class="btn btn-sm py-0 px-1 me-1" style="border:1px solid var(--brand);color:var(--brand)"
+                  onclick="openLegameModal(${pIdx},${lIdx})" title="Modifica">
             <i class="bi bi-pencil"></i>
           </button>
-          <button class="btn btn-outline-danger btn-sm py-0 px-1"
-                  onclick="confirmDeleteLegame(${pIdx},${lIdx})" title="Elimina legame">
+          <button class="btn btn-sm py-0 px-1 btn-outline-danger"
+                  onclick="confirmDeleteLegame(${pIdx},${lIdx})" title="Elimina">
             <i class="bi bi-trash"></i>
           </button>
         </td>
       </tr>`;
 
-      // ── Titolari Effettivi – solo strategia Q ──
+      // ── Titolari – solo Q ──
       if (!isP) {
         const hasTit = l.titolari_effettivi && l.titolari_effettivi.length > 0;
         html += `<tr>
           <td colspan="8" class="pt-0 pb-2" style="border-top:none">
             <div class="titolari-block">
               <div class="d-flex align-items-center gap-2 mb-1">
-                <i class="bi bi-person-badge small" style="color:#e67e22"></i>
-                <strong style="font-size:.78rem">Titolari Effettivi</strong>
-                <button class="btn btn-outline-success btn-sm py-0 px-2 ms-auto"
-                        style="font-size:.75rem"
+                <i class="bi bi-person-badge small" style="color:var(--amber)"></i>
+                <strong style="font-size:.76rem;color:var(--text)">Titolari Effettivi</strong>
+                <button class="btn btn-sm py-0 px-2 ms-auto" style="font-size:.73rem;border:1px solid #2ea87e;color:#2ea87e"
                         onclick="openTitolareModal(${pIdx},${lIdx},-1)">
                   <i class="bi bi-person-plus-fill me-1"></i>Aggiungi
                 </button>
               </div>`;
-
         if (hasTit) {
           l.titolari_effettivi.forEach((t, tIdx) => {
             html += `<div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-              <i class="bi bi-person-fill text-warning"></i>
-              <span class="fw-semibold">${esc(t.denominazione)}</span>
-              <code style="font-size:.72rem">${esc(t.pk)}</code>
-              <span class="badge bg-warning text-dark">${esc(t.totale_quota_cumulativa)}%</span>
-              <span class="text-muted small">${esc(t.tipologia_quantitativo || '')}</span>
+              <i class="bi bi-person-fill" style="color:var(--amber)"></i>
+              <span class="fw-500" style="color:var(--text)">${esc(t.denominazione)}</span>
+              <code>${esc(t.pk)}</code>
+              <span class="badge" style="background:var(--amber)">${esc(t.totale_quota_cumulativa)}%</span>
+              <span style="font-size:.73rem;color:var(--text-light)">${esc(t.tipologia_quantitativo || '')}</span>
               <div class="ms-auto d-flex gap-1">
-                <button class="btn btn-outline-primary btn-sm py-0 px-1"
+                <button class="btn btn-sm py-0 px-1" style="border:1px solid var(--brand);color:var(--brand)"
                         onclick="openTitolareModal(${pIdx},${lIdx},${tIdx})" title="Modifica">
                   <i class="bi bi-pencil"></i>
                 </button>
@@ -748,8 +915,7 @@ function renderCatena() {
             </div>`;
           });
         } else {
-          html += `<span class="text-muted fst-italic" style="font-size:.78rem">
-                     Nessun titolare effettivo individuato</span>`;
+          html += `<span style="font-size:.76rem;color:var(--text-light);font-style:italic">Nessun titolare effettivo individuato</span>`;
         }
         html += `</div></td></tr>`;
       }
@@ -757,49 +923,43 @@ function renderCatena() {
 
     html += `</tbody></table></div>
       <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary btn-sm" onclick="openLegameModal(${pIdx},-1)">
+        <button class="btn btn-brand btn-sm" onclick="openLegameModal(${pIdx},-1)">
           <i class="bi bi-plus-lg me-1"></i>Aggiungi Legame
         </button>
       </div>`;
   });
 
-  // ── Aggiungi Percorso ──
   html += `<div class="border-top pt-2 d-flex justify-content-end">
     <button class="btn btn-outline-secondary btn-sm" onclick="addPercorso()">
       <i class="bi bi-diagram-2 me-1"></i>Aggiungi Percorso
     </button>
   </div>`;
 
-  // ── Sezione Poteri – solo strategia P ──
-  if (isP) {
-    html += renderPoteriBlock();
-  }
+  // ── Poteri – solo P ──
+  if (isP) html += renderPoteriBlock();
 
   document.getElementById('catenaContent').innerHTML = html;
   document.getElementById('strategiaCalcolo').value = catena.strategia_calcolo;
 }
 
-// ── Blocco Poteri ─────────────────────────────────
 function renderPoteriBlock() {
   const poteri = R().catena.poteri || [];
-  let html = `
-  <div class="poteri-section mt-3">
+  let html = `<div class="poteri-section">
     <div class="d-flex align-items-center gap-2 mb-2">
-      <i class="bi bi-person-lines-fill" style="color:#6610f2"></i>
-      <strong>Poteri e Cariche</strong>
-      <button class="btn btn-sm ms-auto fw-semibold"
-              style="background:#6610f2;color:#fff;border-color:#6610f2"
-              onclick="openPotereModal(-1)">
+      <i class="bi bi-person-lines-fill" style="color:var(--teal-dark)"></i>
+      <strong style="color:var(--teal-dark)">Poteri e Cariche</strong>
+      <button class="btn btn-teal btn-sm ms-auto" onclick="openPotereModal(-1)">
         <i class="bi bi-person-plus-fill me-1"></i>Aggiungi
       </button>
     </div>`;
 
   if (!poteri.length) {
-    html += `<p class="text-muted fst-italic small mb-0">Nessun potere/carica individuato</p>`;
+    html += `<p style="color:var(--text-light);font-style:italic;font-size:.82rem;margin-bottom:0">
+               Nessun potere/carica individuato</p>`;
   } else {
     html += `<div class="table-responsive">
       <table class="table table-hover small mb-0" style="background:transparent">
-        <thead style="font-size:.78rem" class="text-muted">
+        <thead style="font-size:.76rem;color:var(--text-light)">
           <tr>
             <th>PK / CF</th>
             <th>Denominazione</th>
@@ -807,20 +967,20 @@ function renderPoteriBlock() {
             <th class="d-none d-md-table-cell">Data Nascita</th>
             <th class="d-none d-lg-table-cell">Luogo Nascita</th>
             <th style="width:60px">Livello</th>
-            <th style="width:90px" class="text-end">Azioni</th>
+            <th style="width:88px" class="text-end">Azioni</th>
           </tr>
         </thead>
         <tbody>`;
     poteri.forEach((p, idx) => {
-      html += `<tr>
-        <td><code style="font-size:.72rem">${esc(p.pk)}</code></td>
-        <td class="fw-semibold">${esc(p.denominazione)}</td>
-        <td><span class="badge" style="background:#6610f2">${esc(p.carica)}</span></td>
-        <td class="d-none d-md-table-cell text-muted">${esc(p.data_nascita || '')}</td>
-        <td class="d-none d-lg-table-cell text-muted">${esc(p.luogo_nascita || '')}</td>
+      html += `<tr style="background:transparent">
+        <td><code>${esc(p.pk)}</code></td>
+        <td class="fw-500" style="color:var(--text)">${esc(p.denominazione)}</td>
+        <td><span class="badge badge-poteri">${esc(p.carica)}</span></td>
+        <td class="d-none d-md-table-cell" style="color:var(--text-light)">${esc(p.data_nascita || '')}</td>
+        <td class="d-none d-lg-table-cell" style="color:var(--text-light)">${esc(p.luogo_nascita || '')}</td>
         <td><span class="badge bg-secondary">${esc(p.livello || '')}</span></td>
         <td class="text-end">
-          <button class="btn btn-outline-primary btn-sm py-0 px-1 me-1"
+          <button class="btn btn-sm py-0 px-1 me-1" style="border:1px solid var(--teal-dark);color:var(--teal-dark)"
                   onclick="openPotereModal(${idx})" title="Modifica">
             <i class="bi bi-pencil"></i>
           </button>
@@ -837,34 +997,33 @@ function renderPoteriBlock() {
   return html;
 }
 
-// ─────────────────────────────────────────────────
 function renderAnagrafiche() {
   const list = R().anagrafiche;
   if (!list.length) {
     document.getElementById('anagraficheContent').innerHTML =
-      '<p class="text-muted text-center py-4 mb-0"><i class="bi bi-inbox me-2"></i>Nessuna anagrafica presente</p>';
+      `<p class="text-center py-4 mb-0" style="color:var(--text-light)"><i class="bi bi-inbox me-2"></i>Nessuna anagrafica presente</p>`;
     return;
   }
   let html = `<div class="table-responsive">
     <table class="table table-hover small mb-0">
-      <thead class="table-light text-muted" style="font-size:.78rem">
+      <thead style="font-size:.76rem;color:var(--text-light);background:#f8fbfd">
         <tr>
           <th>PK / PIVA</th>
           <th>Ragione Sociale</th>
           <th class="d-none d-md-table-cell">PIVA</th>
           <th class="d-none d-lg-table-cell">Indirizzo</th>
-          <th style="width:90px" class="text-end">Azioni</th>
+          <th style="width:88px" class="text-end">Azioni</th>
         </tr>
       </thead>
       <tbody>`;
   list.forEach((a, idx) => {
     html += `<tr>
       <td><code>${esc(a.pk)}</code></td>
-      <td class="fw-semibold">${esc(a.ragione_sociale || '')}</td>
-      <td class="text-muted d-none d-md-table-cell">${esc(a.piva || '')}</td>
-      <td class="text-muted d-none d-lg-table-cell small">${esc(a.indirizzo || '')}</td>
+      <td class="fw-500" style="color:var(--text)">${esc(a.ragione_sociale || '')}</td>
+      <td class="d-none d-md-table-cell" style="color:var(--text-light)">${esc(a.piva || '')}</td>
+      <td class="d-none d-lg-table-cell small" style="color:var(--text-light)">${esc(a.indirizzo || '')}</td>
       <td class="text-end">
-        <button class="btn btn-outline-primary btn-sm py-0 px-1 me-1"
+        <button class="btn btn-sm py-0 px-1 me-1" style="border:1px solid var(--brand);color:var(--brand)"
                 onclick="openAnagraficaModal(${idx})" title="Modifica">
           <i class="bi bi-pencil"></i>
         </button>
@@ -884,10 +1043,7 @@ function renderAnagrafiche() {
 // ═══════════════════════════════════════════════════
 function updateStrategia(val) {
   R().catena.strategia_calcolo = val;
-  // Inizializza poteri se si passa a P e non esiste già
-  if (val === 'P' && !Array.isArray(R().catena.poteri)) {
-    R().catena.poteri = [];
-  }
+  if (val === 'P' && !Array.isArray(R().catena.poteri)) R().catena.poteri = [];
   renderCatena();
   toast('Strategia aggiornata: ' + val);
 }
@@ -897,11 +1053,8 @@ function updateStrategia(val) {
 // ═══════════════════════════════════════════════════
 function openLegameModal(pIdx, lIdx) {
   state.editLegame = { pIdx, lIdx };
-  const isNew = lIdx === -1;
-  document.getElementById('legameModalTitle').textContent =
-    isNew ? 'Aggiungi Legame' : 'Modifica Legame';
-
-  if (!isNew) {
+  document.getElementById('legameModalTitle').textContent = lIdx === -1 ? 'Aggiungi Legame' : 'Modifica Legame';
+  if (lIdx !== -1) {
     const l = R().catena.percorsi[pIdx].percorso[lIdx];
     document.getElementById('lFromPk').value     = l.anagrafica_fornitore_from_pk;
     document.getElementById('lToPk').value       = l.anagrafica_fornitore_to_pk;
@@ -910,8 +1063,7 @@ function openLegameModal(pIdx, lIdx) {
     document.getElementById('lLivello').value    = l.livello;
     document.getElementById('lEtichetta').value  = l.etichetta_grafo || '';
   } else {
-    ['lFromPk','lToPk','lShares','lLivello','lEtichetta'].forEach(id =>
-      document.getElementById(id).value = '');
+    ['lFromPk','lToPk','lShares','lLivello','lEtichetta'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('lTipoLegame').value = 'P';
   }
   refreshPkList();
@@ -925,214 +1077,134 @@ function saveLegame() {
   const tipo    = document.getElementById('lTipoLegame').value;
   const livello = document.getElementById('lLivello').value.trim();
   const etich   = document.getElementById('lEtichetta').value.trim();
-
   if (!fromPk || !toPk || !shares || !livello || !etich) {
     alert('Compila tutti i campi obbligatori (Da, A, Quote %, Livello, Etichetta Grafo).');
     return;
   }
-
   const { pIdx, lIdx } = state.editLegame;
   const percorso = R().catena.percorsi[pIdx].percorso;
   const obj = {
-    shares: String(shares),
-    anagrafica_fornitore_from_pk: fromPk,
-    anagrafica_fornitore_to_pk:   toPk,
-    tipo_legame:       tipo,
-    livello:           String(livello),
+    shares: String(shares), anagrafica_fornitore_from_pk: fromPk,
+    anagrafica_fornitore_to_pk: toPk, tipo_legame: tipo,
+    livello: String(livello),
     titolari_effettivi: lIdx === -1 ? [] : percorso[lIdx].titolari_effettivi,
-    etichetta_grafo:   etich
+    etichetta_grafo: etich
   };
-
-  if (lIdx === -1) percorso.push(obj);
-  else            percorso[lIdx] = obj;
-
-  modLegame.hide();
-  renderCatena();
-  refreshPkList();
+  if (lIdx === -1) percorso.push(obj); else percorso[lIdx] = obj;
+  modLegame.hide(); renderCatena(); refreshPkList();
   toast(lIdx === -1 ? 'Legame aggiunto' : 'Legame modificato');
 }
 
 function confirmDeleteLegame(pIdx, lIdx) {
   if (confirm('Eliminare questo legame?\nVerranno eliminati anche i relativi titolari effettivi.'))
-    deleteLegame(pIdx, lIdx);
-}
-function deleteLegame(pIdx, lIdx) {
-  R().catena.percorsi[pIdx].percorso.splice(lIdx, 1);
-  renderCatena();
-  toast('Legame eliminato', 'warning');
+    { R().catena.percorsi[pIdx].percorso.splice(lIdx, 1); renderCatena(); toast('Legame eliminato', 'warning'); }
 }
 
 function addPercorso() {
-  R().catena.percorsi.push({ percorso: [] });
-  renderCatena();
-  toast('Nuovo percorso aggiunto');
+  R().catena.percorsi.push({ percorso: [] }); renderCatena(); toast('Nuovo percorso aggiunto');
 }
 function confirmDeletePercorso(pIdx) {
   if (R().catena.percorsi.length <= 1) { alert("Non puoi eliminare l'unico percorso."); return; }
-  if (confirm('Eliminare il percorso ' + (pIdx + 1) + ' con tutti i suoi legami?')) {
-    R().catena.percorsi.splice(pIdx, 1);
-    renderCatena();
-    toast('Percorso eliminato', 'warning');
+  if (confirm('Eliminare il percorso ' + (pIdx + 1) + '?')) {
+    R().catena.percorsi.splice(pIdx, 1); renderCatena(); toast('Percorso eliminato', 'warning');
   }
 }
 
 // ═══════════════════════════════════════════════════
-//  TITOLARI EFFETTIVI CRUD (solo strategia Q)
+//  TITOLARI CRUD (strategia Q)
 // ═══════════════════════════════════════════════════
 function openTitolareModal(pIdx, lIdx, tIdx) {
   state.editTitolare = { pIdx, lIdx, tIdx };
-  const isNew = tIdx === -1;
-  document.getElementById('titolareModalTitle').textContent =
-    isNew ? 'Aggiungi Titolare Effettivo' : 'Modifica Titolare Effettivo';
-
-  if (!isNew) {
+  document.getElementById('titolareModalTitle').textContent = tIdx === -1 ? 'Aggiungi Titolare Effettivo' : 'Modifica Titolare Effettivo';
+  if (tIdx !== -1) {
     const t = R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi[tIdx];
-    document.getElementById('tPk').value            = t.pk || '';
-    document.getElementById('tCF').value            = t.codice_fiscale || '';
-    document.getElementById('tDenominazione').value = t.denominazione || '';
-    document.getElementById('tSesso').value         = t.sesso || 'MALE';
-    document.getElementById('tDataNascita').value   = isoToDate(t.data_nascita);
-    document.getElementById('tStatoNascita').value  = t.stato_nascita || '';
-    document.getElementById('tLuogoNascita').value  = t.luogo_nascita || '';
-    document.getElementById('tTipologiaQ').value    = t.tipologia_quantitativo || 'Quantitativo indiretto';
-    document.getElementById('tRole').value          = t.role || '';
-    document.getElementById('tQuotaCatena').value   = t.quota_catena || '';
-    document.getElementById('tTotaleQuota').value   = t.totale_quota_cumulativa || '';
+    document.getElementById('tPk').value = t.pk||''; document.getElementById('tCF').value = t.codice_fiscale||'';
+    document.getElementById('tDenominazione').value = t.denominazione||''; document.getElementById('tSesso').value = t.sesso||'MALE';
+    document.getElementById('tDataNascita').value = isoToDate(t.data_nascita); document.getElementById('tStatoNascita').value = t.stato_nascita||'';
+    document.getElementById('tLuogoNascita').value = t.luogo_nascita||''; document.getElementById('tTipologiaQ').value = t.tipologia_quantitativo||'Quantitativo indiretto';
+    document.getElementById('tRole').value = t.role||''; document.getElementById('tQuotaCatena').value = t.quota_catena||'';
+    document.getElementById('tTotaleQuota').value = t.totale_quota_cumulativa||'';
   } else {
-    ['tPk','tCF','tDenominazione','tStatoNascita','tLuogoNascita',
-     'tRole','tQuotaCatena','tTotaleQuota','tDataNascita'].forEach(id =>
-      document.getElementById(id).value = '');
-    document.getElementById('tSesso').value      = 'MALE';
-    document.getElementById('tTipologiaQ').value = 'Quantitativo indiretto';
+    ['tPk','tCF','tDenominazione','tStatoNascita','tLuogoNascita','tRole','tQuotaCatena','tTotaleQuota','tDataNascita'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('tSesso').value = 'MALE'; document.getElementById('tTipologiaQ').value = 'Quantitativo indiretto';
   }
   modTitolare.show();
 }
 
 function saveTitolare() {
-  const pk   = document.getElementById('tPk').value.trim().toUpperCase();
-  const den  = document.getElementById('tDenominazione').value.trim().toUpperCase();
+  const pk = document.getElementById('tPk').value.trim().toUpperCase();
+  const den = document.getElementById('tDenominazione').value.trim().toUpperCase();
   const role = document.getElementById('tRole').value.trim();
-
-  if (!pk || !den || !role) {
-    alert('Compila i campi obbligatori: PK, Denominazione, Role %.');
-    return;
-  }
-
+  if (!pk || !den || !role) { alert('Compila i campi obbligatori: PK, Denominazione, Role %.'); return; }
   const quotaCatena = document.getElementById('tQuotaCatena').value.trim() || role;
-  const totQuota    = document.getElementById('tTotaleQuota').value.trim() || role;
-
+  const totQuota = document.getElementById('tTotaleQuota').value.trim() || role;
   const obj = {
-    pk:                     pk,
-    denominazione:           den,
-    codice_fiscale:          document.getElementById('tCF').value.trim().toUpperCase() || pk,
-    stato_nascita:           document.getElementById('tStatoNascita').value.trim().toUpperCase(),
-    luogo_nascita:           document.getElementById('tLuogoNascita').value.trim().toUpperCase(),
-    sesso:                   document.getElementById('tSesso').value,
-    role:                    String(role),
-    tipologia_quantitativo:  document.getElementById('tTipologiaQ').value,
-    quota_catena:            String(quotaCatena),
-    totale_quota_cumulativa: String(totQuota),
-    data_nascita:            dateToISO(document.getElementById('tDataNascita').value)
+    pk, denominazione: den, codice_fiscale: document.getElementById('tCF').value.trim().toUpperCase() || pk,
+    stato_nascita: document.getElementById('tStatoNascita').value.trim().toUpperCase(),
+    luogo_nascita: document.getElementById('tLuogoNascita').value.trim().toUpperCase(),
+    sesso: document.getElementById('tSesso').value, role: String(role),
+    tipologia_quantitativo: document.getElementById('tTipologiaQ').value,
+    quota_catena: String(quotaCatena), totale_quota_cumulativa: String(totQuota),
+    data_nascita: dateToISO(document.getElementById('tDataNascita').value)
   };
-
   const { pIdx, lIdx, tIdx } = state.editTitolare;
   const list = R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi;
-
-  if (tIdx === -1) list.push(obj);
-  else            list[tIdx] = obj;
-
-  modTitolare.hide();
-  renderCatena();
-  toast(tIdx === -1 ? 'Titolare aggiunto' : 'Titolare modificato');
+  if (tIdx === -1) list.push(obj); else list[tIdx] = obj;
+  modTitolare.hide(); renderCatena(); toast(tIdx === -1 ? 'Titolare aggiunto' : 'Titolare modificato');
 }
 
 function confirmDeleteTitolare(pIdx, lIdx, tIdx) {
   if (confirm('Eliminare questo titolare effettivo?'))
-    deleteTitolare(pIdx, lIdx, tIdx);
-}
-function deleteTitolare(pIdx, lIdx, tIdx) {
-  R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi.splice(tIdx, 1);
-  renderCatena();
-  toast('Titolare eliminato', 'warning');
+    { R().catena.percorsi[pIdx].percorso[lIdx].titolari_effettivi.splice(tIdx, 1); renderCatena(); toast('Titolare eliminato', 'warning'); }
 }
 
 // ═══════════════════════════════════════════════════
-//  POTERI CRUD (solo strategia P)
+//  POTERI CRUD (strategia P)
 // ═══════════════════════════════════════════════════
 function openPotereModal(idx) {
   state.editPotere = idx;
-  const isNew = idx === -1;
-  document.getElementById('potereModalTitle').textContent =
-    isNew ? 'Aggiungi Potere / Carica' : 'Modifica Potere / Carica';
-
-  if (!isNew) {
+  document.getElementById('potereModalTitle').textContent = idx === -1 ? 'Aggiungi Potere / Carica' : 'Modifica Potere / Carica';
+  if (idx !== -1) {
     const p = R().catena.poteri[idx];
-    document.getElementById('pPk').value            = p.pk || '';
-    document.getElementById('pCF').value            = p.codice_fiscale || '';
-    document.getElementById('pDenominazione').value = p.denominazione || '';
-    document.getElementById('pCarica').value        = p.carica || '';
-    document.getElementById('pTipoSoggetto').value  = p.tipo_soggetto || 'P';
-    document.getElementById('pSesso').value         = p.sesso || 'Man';
-    document.getElementById('pDataNascita').value   = ddmmyyyyToDate(p.data_nascita);
-    document.getElementById('pLivello').value       = p.livello || '';
-    document.getElementById('pStatoNascita').value  = p.stato_nascita || '';
-    document.getElementById('pLuogoNascita').value  = p.luogo_nascita || '';
-    document.getElementById('pIndirizzo').value     = p.indirizzo || '';
+    document.getElementById('pPk').value = p.pk||''; document.getElementById('pCF').value = p.codice_fiscale||'';
+    document.getElementById('pDenominazione').value = p.denominazione||''; document.getElementById('pCarica').value = p.carica||'';
+    document.getElementById('pTipoSoggetto').value = p.tipo_soggetto||'P'; document.getElementById('pSesso').value = p.sesso||'Man';
+    document.getElementById('pDataNascita').value = ddmmyyyyToDate(p.data_nascita); document.getElementById('pLivello').value = p.livello||'';
+    document.getElementById('pStatoNascita').value = p.stato_nascita||''; document.getElementById('pLuogoNascita').value = p.luogo_nascita||'';
+    document.getElementById('pIndirizzo').value = p.indirizzo||'';
   } else {
-    ['pPk','pCF','pDenominazione','pCarica','pLivello',
-     'pStatoNascita','pLuogoNascita','pIndirizzo','pDataNascita'].forEach(id =>
-      document.getElementById(id).value = '');
-    document.getElementById('pTipoSoggetto').value = 'P';
-    document.getElementById('pSesso').value        = 'Man';
+    ['pPk','pCF','pDenominazione','pCarica','pLivello','pStatoNascita','pLuogoNascita','pIndirizzo','pDataNascita'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pTipoSoggetto').value = 'P'; document.getElementById('pSesso').value = 'Man';
   }
   modPotere.show();
 }
 
 function savePotere() {
-  const pk    = document.getElementById('pPk').value.trim().toUpperCase();
-  const den   = document.getElementById('pDenominazione').value.trim().toUpperCase();
+  const pk = document.getElementById('pPk').value.trim().toUpperCase();
+  const den = document.getElementById('pDenominazione').value.trim().toUpperCase();
   const carica = document.getElementById('pCarica').value.trim().toUpperCase();
-
-  if (!pk || !den || !carica) {
-    alert('Compila i campi obbligatori: PK, Denominazione, Carica.');
-    return;
-  }
-
+  if (!pk || !den || !carica) { alert('Compila i campi obbligatori: PK, Denominazione, Carica.'); return; }
   const obj = {
-    pk:             pk,
-    tipo_soggetto:  document.getElementById('pTipoSoggetto').value,
-    denominazione:  den,
-    codice_fiscale: document.getElementById('pCF').value.trim().toUpperCase() || pk,
-    indirizzo:      document.getElementById('pIndirizzo').value.trim().toUpperCase(),
-    stato_nascita:  document.getElementById('pStatoNascita').value.trim().toUpperCase(),
-    luogo_nascita:  document.getElementById('pLuogoNascita').value.trim().toUpperCase(),
-    sesso:          document.getElementById('pSesso').value,
-    carica:         carica,
-    data_nascita:   dateToDDMMYYYY(document.getElementById('pDataNascita').value),
-    livello:        document.getElementById('pLivello').value.trim().toUpperCase()
+    pk, tipo_soggetto: document.getElementById('pTipoSoggetto').value,
+    denominazione: den, codice_fiscale: document.getElementById('pCF').value.trim().toUpperCase() || pk,
+    indirizzo: document.getElementById('pIndirizzo').value.trim().toUpperCase(),
+    stato_nascita: document.getElementById('pStatoNascita').value.trim().toUpperCase(),
+    luogo_nascita: document.getElementById('pLuogoNascita').value.trim().toUpperCase(),
+    sesso: document.getElementById('pSesso').value, carica,
+    data_nascita: dateToDDMMYYYY(document.getElementById('pDataNascita').value),
+    livello: document.getElementById('pLivello').value.trim().toUpperCase()
   };
-
   const idx = state.editPotere;
   if (!Array.isArray(R().catena.poteri)) R().catena.poteri = [];
   const list = R().catena.poteri;
-
-  if (idx === -1) list.push(obj);
-  else           list[idx] = obj;
-
-  modPotere.hide();
-  renderCatena();
-  toast(idx === -1 ? 'Potere/carica aggiunto' : 'Potere/carica modificato');
+  if (idx === -1) list.push(obj); else list[idx] = obj;
+  modPotere.hide(); renderCatena(); toast(idx === -1 ? 'Potere/carica aggiunto' : 'Potere/carica modificato');
 }
 
 function confirmDeletePotere(idx) {
   const p = R().catena.poteri[idx];
   if (confirm(`Eliminare "${p.denominazione}" (${p.carica})?`))
-    deletePotere(idx);
-}
-function deletePotere(idx) {
-  R().catena.poteri.splice(idx, 1);
-  renderCatena();
-  toast('Potere/carica eliminato', 'warning');
+    { R().catena.poteri.splice(idx, 1); renderCatena(); toast('Potere/carica eliminato', 'warning'); }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1140,19 +1212,13 @@ function deletePotere(idx) {
 // ═══════════════════════════════════════════════════
 function openAnagraficaModal(idx) {
   state.editAnagrafica = idx;
-  const isNew = idx === -1;
-  document.getElementById('anagraficaModalTitle').textContent =
-    isNew ? 'Aggiungi Anagrafica' : 'Modifica Anagrafica';
-
-  if (!isNew) {
+  document.getElementById('anagraficaModalTitle').textContent = idx === -1 ? 'Aggiungi Anagrafica' : 'Modifica Anagrafica';
+  if (idx !== -1) {
     const a = R().anagrafiche[idx];
-    document.getElementById('aPk').value             = a.pk || '';
-    document.getElementById('aRagioneSociale').value = a.ragione_sociale || '';
-    document.getElementById('aPiva').value           = a.piva || '';
-    document.getElementById('aIndirizzo').value      = a.indirizzo || '';
+    document.getElementById('aPk').value = a.pk||''; document.getElementById('aRagioneSociale').value = a.ragione_sociale||'';
+    document.getElementById('aPiva').value = a.piva||''; document.getElementById('aIndirizzo').value = a.indirizzo||'';
   } else {
-    ['aPk','aRagioneSociale','aPiva','aIndirizzo'].forEach(id =>
-      document.getElementById(id).value = '');
+    ['aPk','aRagioneSociale','aPiva','aIndirizzo'].forEach(id => document.getElementById(id).value = '');
   }
   modAnagrafica.show();
 }
@@ -1160,51 +1226,23 @@ function openAnagraficaModal(idx) {
 function saveAnagrafica() {
   const pk = document.getElementById('aPk').value.trim();
   const rs = document.getElementById('aRagioneSociale').value.trim().toUpperCase();
-
-  if (!pk || !rs) {
-    alert('Compila i campi obbligatori: PK e Ragione Sociale.');
-    return;
-  }
-
-  const obj = {
-    pk:              pk,
-    ragione_sociale: rs,
-    piva:            document.getElementById('aPiva').value.trim() || pk,
-    indirizzo:       document.getElementById('aIndirizzo').value.trim().toUpperCase()
-  };
-
-  const idx  = state.editAnagrafica;
+  if (!pk || !rs) { alert('Compila i campi obbligatori: PK e Ragione Sociale.'); return; }
+  const obj = { pk, ragione_sociale: rs, piva: document.getElementById('aPiva').value.trim() || pk, indirizzo: document.getElementById('aIndirizzo').value.trim().toUpperCase() };
+  const idx = state.editAnagrafica;
   const list = R().anagrafiche;
-
   if (idx === -1) {
     const dup = list.findIndex(a => a.pk === pk);
-    if (dup >= 0) {
-      if (!confirm(`PK "${pk}" già presente. Sovrascrivere?`)) return;
-      list[dup] = obj;
-    } else {
-      list.push(obj);
-    }
-  } else {
-    list[idx] = obj;
-  }
-
-  modAnagrafica.hide();
-  renderAnagrafiche();
-  renderCatena();
-  refreshPkList();
+    if (dup >= 0) { if (!confirm(`PK "${pk}" già presente. Sovrascrivere?`)) return; list[dup] = obj; }
+    else list.push(obj);
+  } else list[idx] = obj;
+  modAnagrafica.hide(); renderAnagrafiche(); renderCatena(); refreshPkList();
   toast(idx === -1 ? 'Anagrafica aggiunta' : 'Anagrafica modificata');
 }
 
 function confirmDeleteAnagrafica(idx) {
   const a = R().anagrafiche[idx];
   if (confirm(`Eliminare l'anagrafica "${a.ragione_sociale}" (${a.pk})?`))
-    deleteAnagrafica(idx);
-}
-function deleteAnagrafica(idx) {
-  R().anagrafiche.splice(idx, 1);
-  renderAnagrafiche();
-  refreshPkList();
-  toast('Anagrafica eliminata', 'warning');
+    { R().anagrafiche.splice(idx, 1); renderAnagrafiche(); refreshPkList(); toast('Anagrafica eliminata', 'warning'); }
 }
 </script>
 </body>
