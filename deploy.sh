@@ -15,7 +15,8 @@ set -e
 PROJECT_ID="json-sb"
 SERVICE_NAME="json-sb"
 REGION="europe-west1"
-IMAGE="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
+REPO="json-sb-repo"
+IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${SERVICE_NAME}"
 
 echo "══════════════════════════════════════════════"
 echo "  Json-SB – Deploy su Google Cloud Run"
@@ -47,8 +48,17 @@ echo "🔌  Abilitazione API (Cloud Run, Cloud Build, Container Registry)..."
 gcloud services enable \
     run.googleapis.com \
     cloudbuild.googleapis.com \
-    containerregistry.googleapis.com \
+    artifactregistry.googleapis.com \
     --project="${PROJECT_ID}"
+
+# Crea repository Artifact Registry se non esiste
+if ! gcloud artifacts repositories describe "${REPO}" --location="${REGION}" --project="${PROJECT_ID}" &>/dev/null; then
+    echo "📦  Creazione Artifact Registry repository..."
+    gcloud artifacts repositories create "${REPO}" \
+        --repository-format=docker \
+        --location="${REGION}" \
+        --project="${PROJECT_ID}"
+fi
 
 echo ""
 echo "🔧  Progetto GCP : ${PROJECT_ID}"
