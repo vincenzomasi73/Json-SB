@@ -640,6 +640,11 @@ code        { font-size: .76rem; color: var(--brand-dark); }
             <input type="text" id="azPk" class="form-control" placeholder="es. 02287750356">
           </div>
           <div class="col-md-4">
+            <label class="form-label fw-semibold">Data Evasione <span class="text-danger">*</span></label>
+            <input type="date" id="azDtEvasione" class="form-control">
+          </div>
+          <div class="col-md-4"></div>
+          <div class="col-md-4">
             <label class="form-label fw-semibold">Codice Fiscale</label>
             <input type="text" id="azCF" class="form-control" placeholder="es. 02287750356">
           </div>
@@ -807,6 +812,7 @@ function loadFile(file) {
       showUploadError('Formato non compatibile:\n• ' + errors.join('\n• '));
       return;
     }
+    normalizeData(data);
     state.jsonData = data;
     document.getElementById('uploadScreen').classList.add('d-none');
     document.getElementById('editorScreen').classList.remove('d-none');
@@ -818,24 +824,32 @@ function loadFile(file) {
 
 function validateJSON(d) {
   const e = [];
-  if (!d || typeof d !== 'object') { e.push('Non è un oggetto JSON'); return e; }
+  if (!d || typeof d !== 'object')                   { e.push('Non è un oggetto JSON valido'); return e; }
   if (!Array.isArray(d.risposte) || !d.risposte.length) { e.push('"risposte" mancante o vuoto'); return e; }
   const r = d.risposte[0];
-  if (!r.dt_evasione)                              e.push('"dt_evasione" mancante');
-  if (!r.anagrafica_soggetto?.pk)                  e.push('"anagrafica_soggetto.pk" mancante');
-  if (!r.anagrafica_soggetto?.denominazione)       e.push('"anagrafica_soggetto.denominazione" mancante');
-  if (!r.catena)                                   { e.push('"catena" mancante'); return e; }
-  const strat = r.catena.strategia_calcolo;
-  if (!strat)                                      e.push('"catena.strategia_calcolo" mancante');
-  else if (strat !== 'Q' && strat !== 'P')         e.push(`"catena.strategia_calcolo" deve essere "Q" o "P" (trovato: "${strat}")`);
-  if (!Array.isArray(r.catena.percorsi))           e.push('"catena.percorsi" non è un array');
-  else r.catena.percorsi.forEach((p, i) => {
-    if (!Array.isArray(p.percorso)) e.push(`"catena.percorsi[${i}].percorso" non è un array`);
-  });
-  if (r.catena.poteri !== undefined && !Array.isArray(r.catena.poteri))
+  if (typeof r !== 'object' || r === null)           { e.push('"risposte[0]" non è un oggetto'); return e; }
+  if (r.catena?.percorsi !== undefined && !Array.isArray(r.catena.percorsi))
+    e.push('"catena.percorsi" deve essere un array');
+  if (r.catena?.poteri !== undefined && !Array.isArray(r.catena.poteri))
     e.push('"catena.poteri" deve essere un array');
-  if (!Array.isArray(r.anagrafiche)) e.push('"anagrafiche" non è un array');
+  if (r.anagrafiche !== undefined && !Array.isArray(r.anagrafiche))
+    e.push('"anagrafiche" deve essere un array');
   return e;
+}
+
+function normalizeData(d) {
+  const r = d.risposte[0];
+  if (!r.anagrafica_soggetto)           r.anagrafica_soggetto = {};
+  if (!r.dt_evasione)                   r.dt_evasione = '';
+  if (!r.catena || typeof r.catena !== 'object') r.catena = {};
+  if (!r.catena.strategia_calcolo)      r.catena.strategia_calcolo = 'Q';
+  if (!Array.isArray(r.catena.percorsi)) r.catena.percorsi = [{ percorso: [] }];
+  r.catena.percorsi.forEach(p => {
+    if (!Array.isArray(p.percorso)) p.percorso = [];
+    p.percorso.forEach(l => { if (!Array.isArray(l.titolari_effettivi)) l.titolari_effettivi = []; });
+  });
+  if (r.catena.strategia_calcolo === 'P' && !Array.isArray(r.catena.poteri)) r.catena.poteri = [];
+  if (!Array.isArray(r.anagrafiche)) r.anagrafiche = [];
 }
 
 function showUploadError(msg) {
@@ -858,19 +872,30 @@ function validateDownload() {
   const r = R();
   const errors = [];
 
+  if (!r.dt_evasione)
+    errors.push('"Data Evasione" mancante — compilarla nel modal "Modifica" dell\'Azienda Indagata.');
+  if (!r.anagrafica_soggetto?.pk)
+    errors.push('"PK / PIVA" dell\'Azienda Indagata mancante — compilarlo nel modal "Modifica".');
+  if (!r.anagrafica_soggetto?.denominazione)
+    errors.push('"Denominazione" dell\'Azienda Indagata mancante — compilarla nel modal "Modifica".');
+
+  const strat = r.catena.strategia_calcolo;
+  if (!strat || (strat !== 'Q' && strat !== 'P'))
+    errors.push('"Strategia di Calcolo" non valida — selezionare Q o P dalla Catena Partecipativa.');
+
   const totalLinks = r.catena.percorsi.reduce((sum, p) => sum + (p.percorso?.length || 0), 0);
   if (totalLinks === 0)
-    errors.push('"Catena Partecipativa" non contiene nessun legame: aggiungine almeno uno.');
+    errors.push('"Catena Partecipativa" non contiene nessun legame — aggiungine almeno uno.');
 
   if (!r.anagrafiche || r.anagrafiche.length === 0)
-    errors.push('"Anagrafiche Aziende Collegate" è vuota: aggiungere almeno un\'azienda.');
+    errors.push('"Anagrafiche Aziende Collegate" è vuota — aggiungere almeno un\'azienda.');
 
-  const hasPoteri    = Array.isArray(r.catena.poteri) && r.catena.poteri.length > 0;
-  const hasTitolari  = r.catena.percorsi.some(p =>
+  const hasPoteri   = Array.isArray(r.catena.poteri) && r.catena.poteri.length > 0;
+  const hasTitolari = r.catena.percorsi.some(p =>
     p.percorso.some(l => l.titolari_effettivi && l.titolari_effettivi.length > 0)
   );
   if (!hasPoteri && !hasTitolari)
-    errors.push('Nessun titolare presente: aggiungere almeno un elemento in "Titolari Effettivi" (strategia Q) o in "Poteri e Cariche" (strategia P).');
+    errors.push('Nessun titolare presente — aggiungere almeno un elemento in "Titolari Effettivi" (Q) o "Poteri e Cariche" (P).');
 
   return errors;
 }
@@ -936,9 +961,9 @@ function esc(s) {
 // ═══════════════════════════════════════════════════
 function renderAll() {
   const r = R();
-  document.getElementById('navCompanyName').textContent = r.anagrafica_soggetto.denominazione;
-  document.getElementById('navPiva').textContent = r.anagrafica_soggetto.piva;
-  document.getElementById('navDate').textContent = 'Evasione: ' + fmtDate(r.dt_evasione);
+  document.getElementById('navCompanyName').textContent = r.anagrafica_soggetto.denominazione || '(denominazione mancante)';
+  document.getElementById('navPiva').textContent        = r.anagrafica_soggetto.piva || '';
+  document.getElementById('navDate').textContent        = r.dt_evasione ? 'Evasione: ' + fmtDate(r.dt_evasione) : '';
   renderAnagraficaSoggetto();
   renderCatena();
   renderAnagrafiche();
@@ -983,8 +1008,10 @@ function renderAnagraficaSoggetto() {
 //  AZIENDA INDAGATA CRUD
 // ═══════════════════════════════════════════════════
 function openAziendaModal() {
-  const a = R().anagrafica_soggetto;
+  const r = R();
+  const a = r.anagrafica_soggetto;
   document.getElementById('azPk').value             = a.pk             || '';
+  document.getElementById('azDtEvasione').value     = isoToDate(r.dt_evasione);
   document.getElementById('azCF').value             = a.codiceFiscale  || '';
   document.getElementById('azPiva').value           = a.piva           || '';
   document.getElementById('azDenominazione').value  = a.denominazione  || '';
@@ -1005,10 +1032,12 @@ function saveAziendaIndagata() {
   const pk  = document.getElementById('azPk').value.trim();
   const den = document.getElementById('azDenominazione').value.trim().toUpperCase();
   if (!pk || !den) { alert('PK / PIVA e Denominazione sono obbligatori.'); return; }
-  const a = R().anagrafica_soggetto;
+  const r = R();
+  const a = r.anagrafica_soggetto;
+  r.dt_evasione    = dateToISO(document.getElementById('azDtEvasione').value);
   a.pk             = pk;
-  a.codiceFiscale  = document.getElementById('azCF').value.trim()            || a.codiceFiscale;
-  a.piva           = document.getElementById('azPiva').value.trim()           || a.piva;
+  a.codiceFiscale  = document.getElementById('azCF').value.trim()   || a.codiceFiscale;
+  a.piva           = document.getElementById('azPiva').value.trim()  || a.piva;
   a.denominazione  = den;
   a.indirizzo      = document.getElementById('azIndirizzo').value.trim().toUpperCase();
   a.citta          = document.getElementById('azCitta').value.trim().toUpperCase();
