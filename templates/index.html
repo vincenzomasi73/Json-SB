@@ -280,7 +280,11 @@ code        { font-size: .76rem; color: var(--brand-dark); }
            data-bs-toggle="collapse" data-bs-target="#collapseAnagrafica" role="button">
         <i class="bi bi-building section-icon"></i>
         <span>Azienda Indagata</span>
-        <i class="bi bi-chevron-down ms-auto text-muted small"></i>
+        <button class="btn btn-brand btn-sm ms-auto me-1"
+                onclick="event.stopPropagation();openAziendaModal()" title="Modifica dati azienda">
+          <i class="bi bi-pencil me-1"></i>Modifica
+        </button>
+        <i class="bi bi-chevron-down text-muted small"></i>
       </div>
       <div class="collapse show" id="collapseAnagrafica">
         <div class="card-body py-3" id="anagraficaSoggettoContent"></div>
@@ -425,6 +429,7 @@ code        { font-size: .76rem; color: var(--brand-dark); }
             <select id="tSesso" class="form-select">
               <option value="MALE">Maschile</option>
               <option value="FEMALE">Femminile</option>
+              <option value="OTHER">Altro</option>
             </select>
           </div>
           <div class="col-md-3">
@@ -535,6 +540,7 @@ code        { font-size: .76rem; color: var(--brand-dark); }
             <select id="pSesso" class="form-select">
               <option value="Man">Maschile</option>
               <option value="Woman">Femminile</option>
+              <option value="Other">Altro</option>
             </select>
           </div>
           <div class="col-md-3">
@@ -614,6 +620,122 @@ code        { font-size: .76rem; color: var(--brand-dark); }
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     MODAL: AZIENDA INDAGATA (modifica)
+══════════════════════════════════════════ -->
+<div class="modal fade" id="aziendaModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header modal-header-brand">
+        <h5 class="modal-title"><i class="bi bi-building me-2"></i>Modifica Azienda Indagata</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom" style="color:var(--brand);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">Identificazione</h6>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">PK / PIVA <span class="text-danger">*</span></label>
+            <input type="text" id="azPk" class="form-control" placeholder="es. 02287750356">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Codice Fiscale</label>
+            <input type="text" id="azCF" class="form-control" placeholder="es. 02287750356">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">PIVA</label>
+            <input type="text" id="azPiva" class="form-control" placeholder="es. 02287750356">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Denominazione <span class="text-danger">*</span></label>
+            <input type="text" id="azDenominazione" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. SCRIPTA MANEANT SRL">
+          </div>
+
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom mt-1" style="color:var(--brand);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">Sede &amp; Localizzazione</h6>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Indirizzo</label>
+            <input type="text" id="azIndirizzo" class="form-control" style="text-transform:uppercase"
+                   placeholder="es. VIA DELL'ARCOVEGGIO, 74/2, 40129 BOLOGNA, BO">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">Città</label>
+            <input type="text" id="azCitta" class="form-control" style="text-transform:uppercase" placeholder="es. BOLOGNA">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Stato</label>
+            <input type="text" id="azStato" class="form-control" placeholder="es. Italia">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">CCIAA</label>
+            <input type="text" id="azCciaa" class="form-control" style="text-transform:uppercase" placeholder="es. BO">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">N. REA</label>
+            <input type="text" id="azNrea" class="form-control" placeholder="es. 490907">
+          </div>
+
+          <div class="col-12">
+            <h6 class="fw-600 pb-1 border-bottom mt-1" style="color:var(--brand);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em">Codici &amp; Classificazione</h6>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Stato Attività</label>
+            <input type="text" id="azStatoAttivita" class="form-control" placeholder="es. A">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">ATECO</label>
+            <input type="text" id="azAteco" class="form-control" placeholder="es. 5811">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">SAE</label>
+            <input type="text" id="azSae" class="form-control" placeholder="es. 430">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">RAE</label>
+            <input type="text" id="azRae" class="form-control" placeholder="es. 474">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Data Iscrizione</label>
+            <input type="text" id="azDataIscrizione" class="form-control" placeholder="es. 10/26/16, 12:00 AM">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-brand" onclick="saveAziendaIndagata()">
+          <i class="bi bi-check-lg me-1"></i>Salva
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: ERRORI DOWNLOAD
+══════════════════════════════════════════ -->
+<div class="modal fade" id="downloadErrorModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#dc3545;color:#fff">
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Impossibile scaricare il JSON
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2 text-muted small">Completa le sezioni obbligatorie prima di scaricare:</p>
+        <ul id="downloadErrorList" class="mb-0 ps-3" style="color:#dc3545"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <datalist id="pkList"></datalist>
 
 <!-- Toast -->
@@ -640,16 +762,18 @@ const state = {
   editAnagrafica: null
 };
 
-let modLegame, modTitolare, modPotere, modAnagrafica;
+let modLegame, modTitolare, modPotere, modAnagrafica, modAzienda, modDownloadError;
 
 // ═══════════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-  modLegame     = new bootstrap.Modal('#legameModal');
-  modTitolare   = new bootstrap.Modal('#titolareModal');
-  modPotere     = new bootstrap.Modal('#potereModal');
-  modAnagrafica = new bootstrap.Modal('#anagraficaModal');
+  modLegame        = new bootstrap.Modal('#legameModal');
+  modTitolare      = new bootstrap.Modal('#titolareModal');
+  modPotere        = new bootstrap.Modal('#potereModal');
+  modAnagrafica    = new bootstrap.Modal('#anagraficaModal');
+  modAzienda       = new bootstrap.Modal('#aziendaModal');
+  modDownloadError = new bootstrap.Modal('#downloadErrorModal');
 
   document.getElementById('fileInput').addEventListener('change', e => {
     if (e.target.files[0]) loadFile(e.target.files[0]);
@@ -730,7 +854,35 @@ function showUpload() {
 // ═══════════════════════════════════════════════════
 //  DOWNLOAD
 // ═══════════════════════════════════════════════════
+function validateDownload() {
+  const r = R();
+  const errors = [];
+
+  const totalLinks = r.catena.percorsi.reduce((sum, p) => sum + (p.percorso?.length || 0), 0);
+  if (totalLinks === 0)
+    errors.push('"Catena Partecipativa" non contiene nessun legame: aggiungine almeno uno.');
+
+  if (!r.anagrafiche || r.anagrafiche.length === 0)
+    errors.push('"Anagrafiche Aziende Collegate" è vuota: aggiungere almeno un\'azienda.');
+
+  const hasPoteri    = Array.isArray(r.catena.poteri) && r.catena.poteri.length > 0;
+  const hasTitolari  = r.catena.percorsi.some(p =>
+    p.percorso.some(l => l.titolari_effettivi && l.titolari_effettivi.length > 0)
+  );
+  if (!hasPoteri && !hasTitolari)
+    errors.push('Nessun titolare presente: aggiungere almeno un elemento in "Titolari Effettivi" (strategia Q) o in "Poteri e Cariche" (strategia P).');
+
+  return errors;
+}
+
 function downloadJSON() {
+  const errors = validateDownload();
+  if (errors.length) {
+    document.getElementById('downloadErrorList').innerHTML =
+      errors.map(e => `<li class="mb-1">${esc(e)}</li>`).join('');
+    modDownloadError.show();
+    return;
+  }
   const blob = new Blob([JSON.stringify(state.jsonData, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -795,21 +947,82 @@ function renderAll() {
 
 function renderAnagraficaSoggetto() {
   const a = R().anagrafica_soggetto;
-  const fields = [
-    ['PK / PIVA', a.pk], ['Codice Fiscale', a.codiceFiscale],
-    ['Denominazione', a.denominazione], ['Indirizzo', a.indirizzo],
-    ['Città', a.citta], ['Stato', a.stato],
-    ['CCIAA', a.cciaa], ['N. REA', a.nrea],
-    ['Stato Attività', a.statoAttivita], ['ATECO', a.ateco],
-    ['SAE', a.sae], ['RAE', a.rae],
-    ['Data Iscrizione', a.dataIscrizione]
-  ].filter(([, v]) => v != null && v !== '');
+  const v = s => s != null && s !== '' ? esc(s) : '<span style="color:#ccc">—</span>';
+
+  const row1 = [
+    { label: 'PK / PIVA',      val: a.pk,           cls: 'col-6 col-sm-4 col-md-2' },
+    { label: 'Codice Fiscale', val: a.codiceFiscale, cls: 'col-6 col-sm-4 col-md-2' },
+    { label: 'Denominazione',  val: a.denominazione, cls: 'col-12 col-sm-8 col-md-4', bold: true },
+    { label: 'Indirizzo',      val: a.indirizzo,     cls: 'col-12 col-md-4' },
+  ];
+  const row2 = [
+    { label: 'Città',           val: a.citta,          cls: 'col-6 col-sm-3 col-md-2' },
+    { label: 'Stato',           val: a.stato,          cls: 'col-6 col-sm-2 col-md-1' },
+    { label: 'CCIAA',           val: a.cciaa,          cls: 'col-4 col-sm-2 col-md-1' },
+    { label: 'N. REA',          val: a.nrea,           cls: 'col-4 col-sm-2 col-md-1' },
+    { label: 'Stato Attività',  val: a.statoAttivita,  cls: 'col-4 col-sm-2 col-md-1' },
+    { label: 'ATECO',           val: a.ateco,          cls: 'col-4 col-sm-2 col-md-1' },
+    { label: 'SAE',             val: a.sae,            cls: 'col-4 col-sm-2 col-md-1' },
+    { label: 'RAE',             val: a.rae,            cls: 'col-4 col-sm-2 col-md-1' },
+    { label: 'Data Iscrizione', val: a.dataIscrizione, cls: 'col-8 col-sm-3 col-md-2' },
+  ];
+
+  const renderField = f =>
+    `<div class="${f.cls}">` +
+    `<div class="field-label" style="font-size:.69rem;text-transform:uppercase;letter-spacing:.04em">${f.label}</div>` +
+    `<div style="color:var(--text);font-size:.875rem;${f.bold ? 'font-weight:600' : ''}">${v(f.val)}</div>` +
+    `</div>`;
 
   document.getElementById('anagraficaSoggettoContent').innerHTML =
-    '<div class="row row-cols-auto g-3">' +
-    fields.map(([k, v]) =>
-      `<div class="col"><div class="field-label">${esc(k)}</div><strong style="color:var(--text)">${esc(v)}</strong></div>`
-    ).join('') + '</div>';
+    `<div class="row g-2 mb-2">${row1.map(renderField).join('')}</div>` +
+    `<div style="border-top:1px solid #edf2f5;margin:0 -1rem;padding:0 1rem">` +
+    `<div class="row g-2 pt-2">${row2.map(renderField).join('')}</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  AZIENDA INDAGATA CRUD
+// ═══════════════════════════════════════════════════
+function openAziendaModal() {
+  const a = R().anagrafica_soggetto;
+  document.getElementById('azPk').value             = a.pk             || '';
+  document.getElementById('azCF').value             = a.codiceFiscale  || '';
+  document.getElementById('azPiva').value           = a.piva           || '';
+  document.getElementById('azDenominazione').value  = a.denominazione  || '';
+  document.getElementById('azIndirizzo').value      = a.indirizzo      || '';
+  document.getElementById('azCitta').value          = a.citta          || '';
+  document.getElementById('azStato').value          = a.stato          || '';
+  document.getElementById('azCciaa').value          = a.cciaa          || '';
+  document.getElementById('azNrea').value           = a.nrea           || '';
+  document.getElementById('azStatoAttivita').value  = a.statoAttivita  || '';
+  document.getElementById('azAteco').value          = a.ateco          || '';
+  document.getElementById('azSae').value            = a.sae            || '';
+  document.getElementById('azRae').value            = a.rae            || '';
+  document.getElementById('azDataIscrizione').value = a.dataIscrizione || '';
+  modAzienda.show();
+}
+
+function saveAziendaIndagata() {
+  const pk  = document.getElementById('azPk').value.trim();
+  const den = document.getElementById('azDenominazione').value.trim().toUpperCase();
+  if (!pk || !den) { alert('PK / PIVA e Denominazione sono obbligatori.'); return; }
+  const a = R().anagrafica_soggetto;
+  a.pk             = pk;
+  a.codiceFiscale  = document.getElementById('azCF').value.trim()            || a.codiceFiscale;
+  a.piva           = document.getElementById('azPiva').value.trim()           || a.piva;
+  a.denominazione  = den;
+  a.indirizzo      = document.getElementById('azIndirizzo').value.trim().toUpperCase();
+  a.citta          = document.getElementById('azCitta').value.trim().toUpperCase();
+  a.stato          = document.getElementById('azStato').value.trim();
+  a.cciaa          = document.getElementById('azCciaa').value.trim().toUpperCase();
+  a.nrea           = document.getElementById('azNrea').value.trim();
+  a.statoAttivita  = document.getElementById('azStatoAttivita').value.trim().toUpperCase();
+  a.ateco          = document.getElementById('azAteco').value.trim();
+  a.sae            = document.getElementById('azSae').value.trim();
+  a.rae            = document.getElementById('azRae').value.trim();
+  a.dataIscrizione = document.getElementById('azDataIscrizione').value.trim();
+  modAzienda.hide();
+  renderAll();
+  toast('Azienda Indagata aggiornata');
 }
 
 // ═══════════════════════════════════════════════════
