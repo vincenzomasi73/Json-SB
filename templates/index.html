@@ -1255,8 +1255,31 @@ function renderAnagrafiche() {
 //  STRATEGIA
 // ═══════════════════════════════════════════════════
 function updateStrategia(val) {
+  const current = R().catena.strategia_calcolo;
+  if (val === current) return;
+
+  const countTitolari = R().catena.percorsi.reduce((s, p) =>
+    s + p.percorso.reduce((ss, l) => ss + (l.titolari_effettivi?.length || 0), 0), 0);
+  const countPoteri = (R().catena.poteri || []).length;
+
+  if (val === 'P' && countTitolari > 0) {
+    if (!confirm(
+      `Passando a Strategia P verr${countTitolari === 1 ? 'à rimosso 1 titolare effettivo' : `anno rimossi ${countTitolari} titolari effettivi`} collegati ai legami.\n\nI dati non saranno recuperabili. Continuare?`
+    )) { document.getElementById('strategiaCalcolo').value = current; return; }
+  }
+  if (val === 'Q' && countPoteri > 0) {
+    if (!confirm(
+      `Passando a Strategia Q verr${countPoteri === 1 ? 'à rimosso 1 potere/carica' : `anno rimossi ${countPoteri} poteri/cariche`}.\n\nI dati non saranno recuperabili. Continuare?`
+    )) { document.getElementById('strategiaCalcolo').value = current; return; }
+  }
+
   R().catena.strategia_calcolo = val;
-  if (val === 'P' && !Array.isArray(R().catena.poteri)) R().catena.poteri = [];
+  if (val === 'P') {
+    if (!Array.isArray(R().catena.poteri)) R().catena.poteri = [];
+    R().catena.percorsi.forEach(p => p.percorso.forEach(l => { l.titolari_effettivi = []; }));
+  } else {
+    R().catena.poteri = [];
+  }
   renderCatena();
   toast('Strategia aggiornata: ' + val);
 }
